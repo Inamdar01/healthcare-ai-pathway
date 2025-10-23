@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Healthcare - Login</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Arial', sans-serif;
+        background: #000000;
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      #particles-js {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #000000;
+        z-index: -1;
+      }
+
+      .container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .glow-button {
+        position: relative;
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        border: none;
+        border-radius: 50px;
+        color: white;
+        font-size: 2rem;
+        font-weight: bold;
+        padding: 20px 60px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      .glow-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      }
+
+      .glow-button:active {
+        transform: translateY(-2px);
+      }
+
+      .star-1, .star-2, .star-3, .star-4, .star-5, .star-6 {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        opacity: 0;
+        animation: sparkle 2s infinite;
+      }
+
+      .star-1 { top: 10%; left: 10%; animation-delay: 0s; }
+      .star-2 { top: 20%; right: 10%; animation-delay: 0.3s; }
+      .star-3 { bottom: 10%; left: 20%; animation-delay: 0.6s; }
+      .star-4 { bottom: 20%; right: 20%; animation-delay: 0.9s; }
+      .star-5 { top: 50%; left: -10%; animation-delay: 1.2s; }
+      .star-6 { top: 50%; right: -10%; animation-delay: 1.5s; }
+
+      .fil0 {
+        fill: white;
+      }
+
+      @keyframes sparkle {
+        0%, 100% { opacity: 0; transform: scale(0); }
+        50% { opacity: 1; transform: scale(1); }
+      }
+
+      .auth-container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 40px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .auth-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .auth-title {
+        color: white;
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .auth-subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+      }
+
+      .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .form-label {
+        color: white;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      .form-input {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 15px;
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .form-input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: #4ecdc4;
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .auth-button {
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-size: 1.1rem;
+        font-weight: bold;
+        padding: 18px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 10px;
+      }
+
+      .auth-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .auth-button:active {
+        transform: translateY(-1px);
+      }
+
+      .auth-switch {
+        text-align: center;
+        margin-top: 25px;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .auth-switch-link {
+        color: #4ecdc4;
+        text-decoration: none;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .auth-switch-link:hover {
+        color: #ff6b6b;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      }
+
+      .error-message {
+        background: rgba(255, 107, 107, 0.2);
+        border: 1px solid rgba(255, 107, 107, 0.5);
+        border-radius: 8px;
+        padding: 12px;
+        color: #ff6b6b;
+        font-size: 0.9rem;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .success-message {
+        background: rgba(78, 205, 196, 0.2);
+        border: 1px solid rgba(78, 205, 196, 0.5);
+        border-radius: 8px;
+        padding: 12px;
+        color: #4ecdc4;
+        font-size: 0.9rem;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .auth-container {
+          padding: 30px 20px;
+          margin: 0 10px;
+        }
+
+        .auth-title {
+          font-size: 2rem;
+        }
+
+        .glow-button {
+          font-size: 1.5rem;
+          padding: 15px 40px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="particles-js"></div>
+
+    <div class="container" id="initialScreen">
+      <button id="clickableButton" class="glow-button">
+        START
+        <div class="star-1">
+          <svg xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 784.11 815.53" style="shape-rendering: geometricPrecision; text-rendering: geometricPrecision; image-rendering: optimizeQuality; fill-rule: evenodd; clip-rule: evenodd;" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+            <defs></defs>
+            <g id="Layer_x0020_1">
+              <metadata id="CorelCorpID_0Corel-Layer"></metadata>
+              <path d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z" class="fil0"></path>
+            </g>
+          </svg>
+        </div>
+        <div class="star-2">
+          <svg xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 784.11 815.53" style="shape-rendering: geometricPrecision; text-rendering: geometricPrecision; image-rendering: optimizeQuality; fill-rule: evenodd; clip-rule: evenodd;" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+            <defs></defs>
+            <g id="Layer_x0020_1">
+              <metadata id="CorelCorpID_0Corel-Layer"></metadata>
+              <path d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z" class="fil0"></path>
+            </g>
+          </svg>
+        </div>
+        <div class="star-3">
+          <svg xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 784.11 815.53" style="shape-rendering: geometricPrecision; text-rendering: geometricPrecision; image-rendering: optimizeQuality; fill-rule: evenodd; clip-rule: evenodd;" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+            <defs></defs>
+            <g id="Layer_x0020_1">
+              <metadata id="CorelCorpID_0Corel-Layer"></metadata>
+              <path d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z" class="fil0"></path>
+            </g>
+          </svg>
+        </div>
+        <div class="star-4">
+          <svg xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 784.11 815.53" style="shape-rendering: geometricPrecision; text-rendering: geometricPrecision; image-rendering: optimizeQuality; fill-rule: evenodd; clip-rule: evenodd;" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+            <defs></defs>
+            <g id="Layer_x0020_1">
+              <metadata id="CorelCorpID_0Corel-Layer"></metadata>
+              <path d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z" class="fil0"></path>
+            </g>
+          </svg>
+        </div>
+        <div class="star-5">
+          <svg xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 784.11 815.53" style="shape-rendering: geometricPrecision; text-rendering: geometricPrecision; image-rendering: optimizeQuality; fill-rule: evenodd; clip-rule: evenodd;" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+            <defs></defs>
+            <g id="Layer_x0020_1">
+              <metadata id="CorelCorpID_0Corel-Layer"></metadata>
+              <path d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z" class="fil0"></path>
+            </g>
+          </svg>
+        </div>
+        <div class="star-6">
+          <svg xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 784.11 815.53" style="shape-rendering: geometricPrecision; text-rendering: geometricPrecision; image-rendering: optimizeQuality; fill-rule: evenodd; clip-rule: evenodd;" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+            <defs></defs>
+            <g id="Layer_x0020_1">
+              <metadata id="CorelCorpID_0Corel-Layer"></metadata>
+              <path d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z" class="fil0"></path>
+            </g>
+          </svg>
+        </div>
+      </button>
+    </div>
+
+    <div class="container hidden" id="authScreen">
+      <div class="auth-container">
+        <div class="auth-header">
+          <h1 class="auth-title" id="authTitle">Login</h1>
+          <p class="auth-subtitle" id="authSubtitle">Welcome back to AI Healthcare</p>
+        </div>
+
+        <div id="messageContainer"></div>
+
+        <form class="auth-form" id="authForm">
+          <div class="form-group hidden" id="nameGroup">
+            <label class="form-label" for="name">Full Name</label>
+            <input class="form-input" type="text" id="name" name="name" placeholder="Enter your full name">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email</label>
+            <input class="form-input" type="email" id="email" name="email" placeholder="Enter your email" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-input" type="password" id="password" name="password" placeholder="Enter your password" required>
+          </div>
+
+          <div class="form-group hidden" id="confirmPasswordGroup">
+            <label class="form-label" for="confirmPassword">Confirm Password</label>
+            <input class="form-input" type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password">
+          </div>
+
+          <button type="submit" class="auth-button" id="authSubmitBtn">Login</button>
+        </form>
+
+        <div class="auth-switch">
+          <span id="switchText">Don't have an account?</span>
+          <a class="auth-switch-link" id="switchLink">Register here</a>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+      particlesJS("particles-js", {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: "#ffffff" },
+          shape: { type: "circle" },
+          opacity: { value: 0.5, random: false },
+          size: { value: 3, random: true },
+          line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
+          move: { enable: true, speed: 6, direction: "none", random: false, straight: false, out_mode: "out", bounce: false }
+        },
+        interactivity: {
+          detect_on: "canvas",
+          events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+          modes: { grab: { distance: 400 }, bubble: { distance: 400, size: 40 }, repulse: { distance: 200 }, push: { particles_nb: 4 }, remove: { particles_nb: 2 } }
+        },
+        retina_detect: true
+      });
+
+      const screens = {
+        initial: document.getElementById('initialScreen'),
+        auth: document.getElementById('authScreen')
+      };
+
+      const authForm = document.getElementById('authForm');
+      const authTitle = document.getElementById('authTitle');
+      const authSubtitle = document.getElementById('authSubtitle');
+      const authSubmitBtn = document.getElementById('authSubmitBtn');
+      const switchText = document.getElementById('switchText');
+      const switchLink = document.getElementById('switchLink');
+      const nameGroup = document.getElementById('nameGroup');
+      const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+      const messageContainer = document.getElementById('messageContainer');
+
+      let isLoginMode = true;
+      let users = {};
+
+      try {
+        users = JSON.parse(localStorage.getItem('healthcareUsers') || '{}');
+      } catch (e) {
+        users = {};
+      }
+
+      function showScreen(screenName) {
+        Object.values(screens).forEach(screen => screen.classList.add('hidden'));
+        screens[screenName].classList.remove('hidden');
+      }
+
+      function showMessage(message, type = 'error') {
+        messageContainer.innerHTML = `<div class="${type}-message">${message}</div>`;
+        setTimeout(() => {
+          messageContainer.innerHTML = '';
+        }, 5000);
+      }
+
+      function switchAuthMode() {
+        isLoginMode = !isLoginMode;
+        
+        if (isLoginMode) {
+          authTitle.textContent = 'Login';
+          authSubtitle.textContent = 'Welcome back to AI Healthcare';
+          authSubmitBtn.textContent = 'LOGIN';
+          switchText.textContent = "Don't have an account?";
+          switchLink.textContent = 'Register here';
+          nameGroup.classList.add('hidden');
+          confirmPasswordGroup.classList.add('hidden');
+        } else {
+          authTitle.textContent = 'Register';
+          authSubtitle.textContent = 'Join AI Healthcare today';
+          authSubmitBtn.textContent = 'REGISTER';
+          switchText.textContent = 'Already have an account?';
+          switchLink.textContent = 'Login here';
+          nameGroup.classList.remove('hidden');
+          confirmPasswordGroup.classList.remove('hidden');
+        }
+        
+        messageContainer.innerHTML = '';
+        authForm.reset();
+      }
+
+      function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+      }
+
+      function validatePassword(password) {
+        return password.length >= 6;
+      }
+
+      function handleAuth(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const name = document.getElementById('name').value.trim();
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (!validateEmail(email)) {
+          showMessage('Please enter a valid email address.');
+          return;
+        }
+
+        if (!validatePassword(password)) {
+          showMessage('Password must be at least 6 characters long.');
+          return;
+        }
+
+        if (isLoginMode) {
+          const user = users[email];
+          if (user && user.password === password) {
+            showMessage('Login successful! Redirecting to dashboard...', 'success');
+            try {
+              localStorage.setItem('currentUser', JSON.stringify(user));
+            } catch (e) {}
+            setTimeout(() => {
+              window.location.href = 'home.html';
+            }, 1500);
+          } else {
+            showMessage('Invalid email or password.');
+          }
+        } else {
+          if (password !== confirmPassword) {
+            showMessage('Passwords do not match.');
+            return;
+          }
+
+          if (!name) {
+            showMessage('Please enter your full name.');
+            return;
+          }
+
+          if (users[email]) {
+            showMessage('An account with this email already exists.');
+            return;
+          }
+
+          const newUser = { name, email, password };
+          users[email] = newUser;
+          try {
+            localStorage.setItem('healthcareUsers', JSON.stringify(users));
+          } catch (e) {}
+          
+          showMessage('Registration successful! You can now login.', 'success');
+          setTimeout(() => {
+            switchAuthMode();
+          }, 2000);
+        }
+      }
+
+      document.getElementById('clickableButton').addEventListener('click', () => {
+        showScreen('auth');
+      });
+
+      switchLink.addEventListener('click', switchAuthMode);
+      authForm.addEventListener('submit', handleAuth);
+
+      const observer = new MutationObserver(() => {
+        if (!screens.auth.classList.contains('hidden')) {
+          document.getElementById('email').focus();
+        }
+      });
+      
+      observer.observe(screens.auth, { attributes: true, attributeFilter: ['class'] });
+
+      if (Object.keys(users).length === 0) {
+        users = {
+          'john@example.com': { name: 'John Doe', email: 'john@example.com', password: '123456' },
+          'jane@example.com': { name: 'Jane Smith', email: 'jane@example.com', password: 'password' }
+        };
+        try {
+          localStorage.setItem('healthcareUsers', JSON.stringify(users));
+        } catch (e) {}
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <title>AI Healthcare - Dashboard</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .topnav {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .topnav a {
+        color: white;
+        text-decoration: none;
+        padding: 20px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+
+      .topnav a:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+      }
+
+      .logo {
+        font-size: 2rem;
+        color: #4ecdc4 !important;
+        margin-right: auto;
+        padding: 20px 30px;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 10px 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 25px;
+        margin-right: 20px;
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+      }
+
+      .main-content {
+        margin-top: 80px;
+        padding: 40px;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .dashboard-header {
+        text-align: center;
+        margin-bottom: 50px;
+      }
+
+      .dashboard-title {
+        font-size: 3rem;
+        color: white;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        margin-bottom: 10px;
+      }
+
+      .dashboard-subtitle {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 40px;
+      }
+
+      .dashboard-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(31, 38, 135, 0.5);
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .card-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+      }
+
+      .medical-records .card-icon {
+        background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+      }
+
+      .symptoms .card-icon {
+        background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+      }
+
+      .test-results .card-icon {
+        background: linear-gradient(45deg, #96ceb4, #feca57);
+      }
+
+      .appointments .card-icon {
+        background: linear-gradient(45deg, #a8edea, #fed6e3);
+      }
+
+      .card-title {
+        font-size: 1.5rem;
+        color: white;
+        font-weight: 600;
+      }
+
+      .card-content {
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.6;
+      }
+
+      .record-item {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-left: 4px solid #ff6b6b;
+        transition: all 0.3s ease;
+      }
+
+      .record-item:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateX(5px);
+      }
+
+      .record-date {
+        font-size: 0.9rem;
+        color: #4ecdc4;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .record-title {
+        color: white;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .record-description {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+      }
+
+      .symptom-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 12px 15px;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .symptom-item:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .symptom-name {
+        color: white;
+        font-weight: 500;
+      }
+
+      .severity-indicator {
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .severity-low { background: #27ae60; color: white; }
+      .severity-medium { background: #f39c12; color: white; }
+      .severity-high { background: #e74c3c; color: white; }
+
+      .test-item {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+      }
+
+      .test-item:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.02);
+      }
+
+      .test-name {
+        color: white;
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .test-status {
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .status-normal { background: #27ae60; color: white; }
+      .status-abnormal { background: #e74c3c; color: white; }
+      .status-pending { background: #f39c12; color: white; }
+
+      .test-value {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .btn-primary {
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        color: white;
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      }
+
+      .services-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 40px;
+      }
+
+      .services-title {
+        font-size: 2.5rem;
+        color: white;
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+      }
+
+      .service-card {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .service-card:hover {
+        transform: translateY(-8px);
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .service-icon {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .service-title {
+        color: white;
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+      }
+
+      .service-description {
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.6;
+      }
+
+      @media (max-width: 1200px) {
+        .dashboard-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .main-content {
+          padding: 20px;
+        }
+        
+        .dashboard-title {
+          font-size: 2rem;
+        }
+        
+        .topnav {
+          flex-direction: column;
+          padding: 10px 0;
+        }
+        
+        .user-info {
+          margin: 10px 0;
+        }
+        
+        .services-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      #particles-js {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1;
+      }
+
+      .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 40px;
+      }
+
+      .quick-action {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .quick-action:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-3px);
+      }
+
+      .quick-action i {
+        font-size: 2rem;
+        margin-bottom: 15px;
+        color: #4ecdc4;
+      }
+
+      .quick-action h4 {
+        color: white;
+        margin-bottom: 10px;
+      }
+
+      .quick-action p {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="particles-js"></div>
+
+    <nav class="topnav">
+      <i class="fas fa-user-md logo"></i>
+      <a href="#home">Home</a>
+      <a href="#services">Services</a>
+      
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatar">U</div>
+        <span style="color: white;" id="userName">User</span>
+        <a href="#" onclick="logout()" style="color: #ff6b6b; padding: 5px 10px;">Logout</a>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="dashboard-header">
+        <h1 class="dashboard-title">Welcome to AI Healthcare Dashboard</h1>
+        <p class="dashboard-subtitle">Your comprehensive health management platform</p>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="dashboard-card medical-records">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-file-medical"></i>
+            </div>
+            <h3 class="card-title">Medical Records</h3>
+          </div>
+          <div class="card-content">
+            <div class="record-item">
+              <div class="record-date">March 15, 2025</div>
+              <div class="record-title">Annual Physical Examination</div>
+              <div class="record-description">Complete health checkup with blood work and vital signs assessment.</div>
+            </div>
+            <div class="record-item">
+              <div class="record-date">February 8, 2025</div>
+              <div class="record-title">Cardiology Consultation</div>
+              <div class="record-description">ECG and stress test results show normal heart function.</div>
+            </div>
+            <div class="record-item">
+              <div class="record-date">January 20, 2025</div>
+              <div class="record-title">Diabetes Management</div>
+              <div class="record-description">HbA1c levels monitored, medication adjusted accordingly.</div>
+            </div>
+            <div class="action-buttons">
+              <button class="btn btn-primary" onclick="viewAllRecords()">View All Records</button>
+              <button class="btn btn-secondary" onclick="addNewRecord()">Add New Record</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-card symptoms">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-thermometer-half"></i>
+            </div>
+            <h3 class="card-title">Current Symptoms</h3>
+          </div>
+          <div class="card-content">
+            <div class="symptom-item">
+              <span class="symptom-name">Headache</span>
+              <span class="severity-indicator severity-medium">Moderate</span>
+            </div>
+            <div class="symptom-item">
+              <span class="symptom-name">Fatigue</span>
+              <span class="severity-indicator severity-low">Mild</span>
+            </div>
+            <div class="symptom-item">
+              <span class="symptom-name">Joint Pain</span>
+              <span class="severity-indicator severity-high">Severe</span>
+            </div>
+            <div class="symptom-item">
+              <span class="symptom-name">Sleep Issues</span>
+              <span class="severity-indicator severity-medium">Moderate</span>
+            </div>
+            <div class="action-buttons">
+              <button class="btn btn-primary" onclick="trackSymptoms()">Track Symptoms</button>
+              <button class="btn btn-secondary" onclick="addSymptom()">Add Symptom</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-card test-results">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-flask"></i>
+            </div>
+            <h3 class="card-title">Latest Test Results</h3>
+          </div>
+          <div class="card-content">
+            <div class="test-item">
+              <div class="test-name">
+                <span>Blood Glucose</span>
+                <span class="test-status status-normal">Normal</span>
+              </div>
+              <div class="test-value">95 mg/dL (Normal: 70-100 mg/dL)</div>
+            </div>
+            <div class="test-item">
+              <div class="test-name">
+                <span>Cholesterol</span>
+                <span class="test-status status-abnormal">High</span>
+              </div>
+              <div class="test-value">245 mg/dL (Normal: <200 mg/dL)</div>
+            </div>
+            <div class="test-item">
+              <div class="test-name">
+                <span>Blood Pressure</span>
+                <span class="test-status status-normal">Normal</span>
+              </div>
+              <div class="test-value">120/80 mmHg (Normal: <120/80 mmHg)</div>
+            </div>
+            <div class="test-item">
+              <div class="test-name">
+                <span>Hemoglobin A1C</span>
+                <span class="test-status status-pending">Pending</span>
+              </div>
+              <div class="test-value">Results expected by March 25, 2025</div>
+            </div>
+            <div class="action-buttons">
+              <button class="btn btn-primary" onclick="viewAllTests()">View All Results</button>
+              <button class="btn btn-secondary" onclick="scheduleTest()">Schedule Test</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-card appointments">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <h3 class="card-title">Upcoming Appointments</h3>
+          </div>
+          <div class="card-content">
+            <div class="record-item">
+              <div class="record-date">March 28, 2025 - 10:00 AM</div>
+              <div class="record-title">Dr. Sarah Johnson - Cardiology</div>
+              <div class="record-description">Follow-up consultation for heart health monitoring.</div>
+            </div>
+            <div class="record-item">
+              <div class="record-date">April 5, 2025 - 2:30 PM</div>
+              <div class="record-title">Dr. Michael Chen - General Medicine</div>
+              <div class="record-description">Quarterly health assessment and medication review.</div>
+            </div>
+            <div class="action-buttons">
+              <button class="btn btn-primary" onclick="viewAllAppointments()">View All</button>
+              <button class="btn btn-secondary" onclick="scheduleAppointment()">Book New</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <div class="quick-action" onclick="emergencyContact()">
+          <i class="fas fa-ambulance"></i>
+          <h4>Emergency</h4>
+          <p>Quick access to emergency services</p>
+        </div>
+        <div class="quick-action" onclick="aiDiagnosis()">
+          <i class="fas fa-robot"></i>
+          <h4>AI Diagnosis</h4>
+          <p>Get AI-powered health insights</p>
+        </div>
+        <div class="quick-action" onclick="medicationReminder()">
+          <i class="fas fa-pills"></i>
+          <h4>Medications</h4>
+          <p>Manage your medication schedule</p>
+        </div>
+        <div class="quick-action" onclick="healthTips()">
+          <i class="fas fa-lightbulb"></i>
+          <h4>Health Tips</h4>
+          <p>Personalized wellness advice</p>
+        </div>
+      </div>
+
+      <div class="services-section">
+        <h2 class="services-title">AI Health Services</h2>
+        <div class="services-grid">
+          <!-- ACTIVE SERVICE -->
+          <div class="service-card" onclick="aiDiagnosis()" style="position: relative;">
+            <div style="position: absolute; top: 10px; right: 10px; background: #27ae60; color: white; padding: 4px 10px; border-radius: 15px; font-size: 0.75rem; font-weight: 600;">ACTIVE</div>
+            <div class="service-icon">
+              <i class="fas fa-robot"></i>
+            </div>
+            <h3 class="service-title">AI Disease Predictor</h3>
+            <p class="service-description">Decision Tree + Naive Bayes ML for disease prediction from symptoms.</p>
+          </div>
+          
+          <!-- Coming Soon Services -->
+          <div class="service-card" onclick="heartDiseasePredictor()">
+            <div class="service-icon">
+              <i class="fas fa-heartbeat"></i>
+            </div>
+            <h3 class="service-title">Heart Disease Prediction</h3>
+            <p class="service-description">Predict cardiovascular risks using Logistic Regression ML.</p>
+          </div>
+          
+          <div class="service-card" onclick="diabetesPrediction()">
+            <div class="service-icon">
+              <i class="fas fa-tint"></i>
+            </div>
+            <h3 class="service-title">Diabetes Prediction</h3>
+            <p class="service-description">Early diabetes risk using Random Forest algorithm.</p>
+          </div>
+          
+          <div class="service-card" onclick="brainCancerDetection()">
+            <div class="service-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <h3 class="service-title">Brain Cancer Detection</h3>
+            <p class="service-description">CNN-based MRI scan analysis for abnormalities.</p>
+          </div>
+          
+          <div class="service-card" onclick="skinCancerDetection()">
+            <div class="service-icon">
+              <i class="fas fa-microscope"></i>
+            </div>
+            <h3 class="service-title">Skin Cancer Detection</h3>
+            <p class="service-description">Deep Learning CNN for skin lesion analysis.</p>
+          </div>
+          
+          <div class="service-card" onclick="lungDiseaseDetection()">
+            <div class="service-icon">
+              <i class="fas fa-lungs"></i>
+            </div>
+            <h3 class="service-title">Lung Disease Detection</h3>
+            <p class="service-description">X-Ray analysis using Convolutional Neural Networks.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+      // Load user data on page load
+      window.addEventListener('DOMContentLoaded', function() {
+        const currentUser = JSON.parse(window.localStorage?.getItem('currentUser') || '{}');
+        
+        if (currentUser && currentUser.name) {
+          document.getElementById('userName').textContent = currentUser.name;
+          
+          const nameParts = currentUser.name.trim().split(' ');
+          let initials = '';
+          if (nameParts.length >= 2) {
+            initials = nameParts[0][0] + nameParts[nameParts.length - 1][0];
+          } else if (nameParts.length === 1) {
+            initials = nameParts[0][0];
+          }
+          document.getElementById('userAvatar').textContent = initials.toUpperCase();
+        } else {
+          window.location.href = 'abc2.html';
+        }
+      });
+
+      particlesJS("particles-js", {
+        particles: {
+          number: { value: 50, density: { enable: true, value_area: 800 } },
+          color: { value: "#ffffff" },
+          shape: {
+            type: "circle",
+            stroke: { width: 0, color: "#000000" },
+            polygon: { nb_sides: 5 },
+          },
+          opacity: {
+            value: 0.3,
+            random: false,
+            anim: { enable: false, speed: 1, opacity_min: 0.1, sync: false },
+          },
+          size: {
+            value: 3,
+            random: true,
+            anim: { enable: false, speed: 40, size_min: 0.1, sync: false },
+          },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: "#ffffff",
+            opacity: 0.2,
+            width: 1,
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: "none",
+            random: false,
+            straight: false,
+            out_mode: "out",
+            bounce: false,
+            attract: { enable: false, rotateX: 600, rotateY: 1200 },
+          },
+        },
+        interactivity: {
+          detect_on: "canvas",
+          events: {
+            onhover: { enable: true, mode: "repulse" },
+            onclick: { enable: true, mode: "push" },
+            resize: true,
+          },
+          modes: {
+            grab: { distance: 400, line_linked: { opacity: 1 } },
+            bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 },
+            repulse: { distance: 100, duration: 0.4 },
+            push: { particles_nb: 4 },
+            remove: { particles_nb: 2 },
+          },
+        },
+        retina_detect: true,
+      });
+
+      function viewAllRecords() {
+        window.location.href = 'view-all-records.html';
+      }
+
+      function addNewRecord() {
+        window.location.href = 'n.html';
+      }
+
+      function trackSymptoms() {
+        alert('Redirecting to Symptom Tracker...');
+      }
+
+      function addSymptom() {
+        alert('Opening Add Symptom form...');
+      }
+
+      function viewAllTests() {
+        alert('Redirecting to Test Results page...');
+      }
+
+      function scheduleTest() {
+        alert('Opening Test Scheduling form...');
+      }
+
+      function viewAllAppointments() {
+        alert('Redirecting to Appointments page...');
+      }
+
+      function scheduleAppointment() {
+        alert('Opening Appointment Booking form...');
+      }
+
+      function emergencyContact() {
+        alert('Emergency services contacted! Help is on the way.');
+      }
+
+      function aiDiagnosis() {
+        alert('Launching AI Diagnosis tool...');
+      }
+
+      function medicationReminder() {
+        alert('Opening Medication Manager...');
+      }
+
+      function healthTips() {
+        alert('Loading personalized health tips...');
+      }
+
+      function brainCancerDetection() {
+        alert('Launching Brain Cancer Detection AI...');
+      }
+
+      function heartDiseasePredictor() {
+        alert('Launching Heart Disease Predictor...');
+      }
+
+      function diabetesPrediction() {
+        alert('Launching Diabetes Prediction tool...');
+      }
+
+      function skinCancerDetection() {
+        alert('Launching Skin Cancer Detection AI...');
+      }
+
+      function lungDiseaseDetection() {
+        alert('Launching Lung Disease Detection...');
+      }
+
+      function liverDiseasePredictor() {
+        alert('Launching Liver Disease Predictor...');
+      }
+
+      function logout() {
+        if (confirm('Are you sure you want to logout?')) {
+          if (window.localStorage) {
+            window.localStorage.removeItem('currentUser');
+          }
+          window.location.href = 'abc2.html';
+        }
+      }
+    </script>
+  </body>
+</html>

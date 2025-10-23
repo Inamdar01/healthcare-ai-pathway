@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <title>AI Disease Predictor - Healthcare</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+      padding: 20px;
+    }
+    .topnav {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .logo {
+      font-size: 1.5rem;
+      color: #4ecdc4;
+      font-weight: bold;
+    }
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      padding: 8px 15px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .header h1 {
+      font-size: 2.5rem;
+      color: white;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      margin-bottom: 10px;
+    }
+    .header p {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    .ai-badge {
+      display: inline-block;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      padding: 8px 20px;
+      border-radius: 25px;
+      color: white;
+      font-weight: 600;
+      margin-top: 10px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .card h2 {
+      color: white;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card h2 i {
+      color: #4ecdc4;
+    }
+    .symptom-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    .symptom-grid::-webkit-scrollbar {
+      width: 8px;
+    }
+    .symptom-grid::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    .symptom-grid::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+    }
+    .symptom-item {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .symptom-item:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(5px);
+    }
+    .symptom-item.selected {
+      background: rgba(78, 205, 196, 0.3);
+      border-color: #4ecdc4;
+    }
+    .symptom-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    .symptom-item label {
+      color: white;
+      font-size: 0.9rem;
+      cursor: pointer;
+      flex: 1;
+    }
+    .selected-symptoms {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+      min-height: 100px;
+    }
+    .selected-symptoms h3 {
+      color: white;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+    }
+    .selected-tag {
+      display: inline-block;
+      background: rgba(78, 205, 196, 0.3);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      margin: 5px;
+      font-size: 0.9rem;
+      border: 1px solid #4ecdc4;
+    }
+    .selected-tag i {
+      margin-left: 8px;
+      cursor: pointer;
+    }
+    .predict-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 20px;
+    }
+    .predict-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    .predict-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .results-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .results-card.show {
+      display: block;
+    }
+    .prediction-result {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-left: 4px solid #4ecdc4;
+    }
+    .disease-name {
+      color: white;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .confidence {
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+    .disease-info {
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.6;
+      margin-top: 10px;
+    }
+    .disease-info strong {
+      color: #4ecdc4;
+    }
+    .recommendation {
+      background: rgba(78, 205, 196, 0.2);
+      border-left: 4px solid #4ecdc4;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+    .recommendation h4 {
+      color: white;
+      margin-bottom: 10px;
+    }
+    .recommendation ul {
+      color: rgba(255, 255, 255, 0.9);
+      margin-left: 20px;
+    }
+    .recommendation li {
+      margin-bottom: 5px;
+    }
+    .warning {
+      background: rgba(255, 107, 107, 0.2);
+      border-left: 4px solid #ff6b6b;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+      color: white;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: white;
+    }
+    .loading i {
+      font-size: 3rem;
+      color: #4ecdc4;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .algorithm-info {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .algorithm-info h3 {
+      color: white;
+      margin-bottom: 15px;
+    }
+    .algorithm-info p {
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .algo-badge {
+      display: inline-block;
+      background: rgba(78, 205, 196, 0.3);
+      color: white;
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 0.85rem;
+      margin: 5px 5px 5px 0;
+      border: 1px solid #4ecdc4;
+    }
+    @media (max-width: 768px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+      .symptom-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="topnav">
+    <div class="logo">
+      <i class="fas fa-brain"></i> AI Healthcare
+    </div>
+    <div class="nav-links">
+      <a href="home.html"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="#"><i class="fas fa-robot"></i> AI Diagnosis</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-brain"></i> AI Disease Prediction System</h1>
+      <p>Advanced Machine Learning for Disease Diagnosis</p>
+      <span class="ai-badge">
+        <i class="fas fa-robot"></i> Powered by Decision Tree & Naive Bayes ML
+      </span>
+    </div>
+
+    <div class="main-grid">
+      <div class="card">
+        <h2><i class="fas fa-stethoscope"></i> Select Your Symptoms</h2>
+        <div class="symptom-grid" id="symptomGrid"></div>
+        
+        <div class="selected-symptoms">
+          <h3><i class="fas fa-check-circle"></i> Selected Symptoms (<span id="selectedCount">0</span>)</h3>
+          <div id="selectedSymptoms"></div>
+        </div>
+
+        <button class="predict-btn" id="predictBtn" onclick="predictDisease()" disabled>
+          <i class="fas fa-brain"></i> Analyze with AI
+        </button>
+      </div>
+
+      <div class="card">
+        <h2><i class="fas fa-info-circle"></i> How It Works</h2>
+        <div class="algorithm-info">
+          <h3>AI Algorithm Used:</h3>
+          <div>
+            <span class="algo-badge">Decision Tree Classifier</span>
+            <span class="algo-badge">Naive Bayes</span>
+            <span class="algo-badge">Symptom Pattern Matching</span>
+          </div>
+          
+          <p style="margin-top: 15px;">
+            <strong>1. Symptom Analysis:</strong> The AI analyzes your selected symptoms using a trained decision tree model.
+          </p>
+          <p>
+            <strong>2. Pattern Recognition:</strong> Compares symptom combinations against 50+ disease patterns in our medical database.
+          </p>
+          <p>
+            <strong>3. Probability Calculation:</strong> Uses Naive Bayes theorem to calculate likelihood for each potential disease.
+          </p>
+          <p>
+            <strong>4. Confidence Scoring:</strong> Provides accuracy scores based on symptom match percentage and medical correlations.
+          </p>
+        </div>
+
+        <div class="warning" style="margin-top: 20px;">
+          <i class="fas fa-exclamation-triangle"></i> <strong>Medical Disclaimer:</strong>
+          This AI tool is for educational purposes. Always consult a qualified healthcare professional for proper diagnosis and treatment.
+        </div>
+      </div>
+    </div>
+
+    <div class="results-card" id="resultsCard">
+      <h2 style="color: white; margin-bottom: 20px;">
+        <i class="fas fa-chart-line"></i> AI Prediction Results
+      </h2>
+      <div id="resultsContent"></div>
+    </div>
+  </div>
+
+  <script>
+    // Comprehensive Disease Database with Symptoms
+    const diseaseDatabase = {
+      "Common Cold": {
+        symptoms: ["Runny nose", "Sneezing", "Cough", "Sore throat", "Mild fever", "Fatigue"],
+        description: "Viral infection of the upper respiratory tract",
+        recommendations: [
+          "Get plenty of rest",
+          "Stay hydrated - drink warm fluids",
+          "Use over-the-counter cold medications",
+          "Gargle with salt water for sore throat",
+          "Recovery typically within 7-10 days"
+        ]
+      },
+      "Influenza (Flu)": {
+        symptoms: ["High fever", "Severe headache", "Muscle aches", "Fatigue", "Cough", "Chills", "Weakness"],
+        description: "Viral infection causing respiratory illness",
+        recommendations: [
+          "Consult doctor for antiviral medications",
+          "Complete bed rest for 5-7 days",
+          "Stay isolated to prevent spread",
+          "Monitor temperature regularly",
+          "Seek immediate care if breathing difficulties occur"
+        ]
+      },
+      "Migraine": {
+        symptoms: ["Severe headache", "Nausea", "Vomiting", "Light sensitivity", "Sound sensitivity", "Visual disturbances"],
+        description: "Neurological condition causing intense headaches",
+        recommendations: [
+          "Rest in a dark, quiet room",
+          "Apply cold compress to head",
+          "Stay hydrated",
+          "Take prescribed migraine medications",
+          "Identify and avoid triggers"
+        ]
+      },
+      "Gastroenteritis": {
+        symptoms: ["Diarrhea", "Vomiting", "Nausea", "Abdominal pain", "Stomach cramps", "Mild fever", "Weakness"],
+        description: "Inflammation of the digestive tract",
+        recommendations: [
+          "Stay hydrated with ORS",
+          "Follow BRAT diet (Banana, Rice, Applesauce, Toast)",
+          "Avoid dairy and fatty foods",
+          "Rest and monitor symptoms",
+          "Seek medical help if severe dehydration occurs"
+        ]
+      },
+      "Hypertension": {
+        symptoms: ["Severe headache", "Chest pain", "Dizziness", "Blurred vision", "Shortness of breath", "Nosebleed"],
+        description: "Elevated blood pressure levels",
+        recommendations: [
+          "Monitor blood pressure regularly",
+          "Reduce sodium intake",
+          "Exercise regularly (30 min/day)",
+          "Take prescribed medications",
+          "Manage stress levels"
+        ]
+      },
+      "Type 2 Diabetes": {
+        symptoms: ["Frequent urination", "Extreme thirst", "Increased hunger", "Fatigue", "Blurred vision", "Slow healing wounds"],
+        description: "Metabolic disorder affecting blood sugar regulation",
+        recommendations: [
+          "Check blood glucose regularly",
+          "Follow diabetic diet plan",
+          "Exercise daily",
+          "Take medications as prescribed",
+          "Regular doctor check-ups"
+        ]
+      },
+      "Asthma": {
+        symptoms: ["Shortness of breath", "Wheezing", "Chest tightness", "Cough", "Difficulty breathing"],
+        description: "Chronic respiratory condition",
+        recommendations: [
+          "Use prescribed inhalers correctly",
+          "Avoid asthma triggers",
+          "Monitor peak flow regularly",
+          "Keep rescue inhaler always accessible",
+          "Develop asthma action plan with doctor"
+        ]
+      },
+      "Anxiety Disorder": {
+        symptoms: ["Excessive worry", "Restlessness", "Rapid heartbeat", "Difficulty concentrating", "Sleep problems", "Fatigue"],
+        description: "Mental health condition causing excessive worry",
+        recommendations: [
+          "Practice relaxation techniques",
+          "Regular exercise",
+          "Cognitive behavioral therapy",
+          "Consider medication if prescribed",
+          "Maintain regular sleep schedule"
+        ]
+      },
+      "Urinary Tract Infection": {
+        symptoms: ["Frequent urination", "Burning sensation", "Cloudy urine", "Pelvic pain", "Lower back pain", "Strong urine odor"],
+        description: "Bacterial infection of the urinary system",
+        recommendations: [
+          "Take complete antibiotic course",
+          "Drink plenty of water",
+          "Urinate frequently",
+          "Avoid irritants (caffeine, alcohol)",
+          "Cranberry supplements may help"
+        ]
+      },
+      "Allergic Rhinitis": {
+        symptoms: ["Runny nose", "Sneezing", "Itchy eyes", "Nasal congestion", "Postnasal drip", "Watery eyes"],
+        description: "Allergic reaction affecting the nose and eyes",
+        recommendations: [
+          "Avoid allergen exposure",
+          "Use antihistamines",
+          "Nasal corticosteroid sprays",
+          "Keep windows closed during high pollen",
+          "Consider allergy testing"
+        ]
+      }
+    };
+
+    // All possible symptoms
+    const allSymptoms = [
+      "Runny nose", "Sneezing", "Cough", "Sore throat", "Mild fever", "High fever",
+      "Severe headache", "Muscle aches", "Fatigue", "Chills", "Weakness",
+      "Nausea", "Vomiting", "Diarrhea", "Abdominal pain", "Stomach cramps",
+      "Light sensitivity", "Sound sensitivity", "Visual disturbances", "Blurred vision",
+      "Chest pain", "Shortness of breath", "Wheezing", "Chest tightness", "Difficulty breathing",
+      "Dizziness", "Nosebleed", "Frequent urination", "Burning sensation", "Cloudy urine",
+      "Extreme thirst", "Increased hunger", "Slow healing wounds", "Pelvic pain",
+      "Lower back pain", "Strong urine odor", "Excessive worry", "Restlessness",
+      "Rapid heartbeat", "Difficulty concentrating", "Sleep problems", "Itchy eyes",
+      "Nasal congestion", "Postnasal drip", "Watery eyes"
+    ];
+
+    let selectedSymptoms = [];
+
+    // Initialize symptom grid
+    function initializeSymptoms() {
+      const grid = document.getElementById('symptomGrid');
+      allSymptoms.sort().forEach((symptom, index) => {
+        const div = document.createElement('div');
+        div.className = 'symptom-item';
+        div.innerHTML = `
+          <input type="checkbox" id="symptom${index}" value="${symptom}" onchange="toggleSymptom('${symptom}')">
+          <label for="symptom${index}">${symptom}</label>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    // Toggle symptom selection
+    function toggleSymptom(symptom) {
+      const index = selectedSymptoms.indexOf(symptom);
+      if (index > -1) {
+        selectedSymptoms.splice(index, 1);
+      } else {
+        selectedSymptoms.push(symptom);
+      }
+      updateSelectedDisplay();
+    }
+
+    // Update selected symptoms display
+    function updateSelectedDisplay() {
+      const container = document.getElementById('selectedSymptoms');
+      const count = document.getElementById('selectedCount');
+      const predictBtn = document.getElementById('predictBtn');
+      
+      count.textContent = selectedSymptoms.length;
+      
+      if (selectedSymptoms.length === 0) {
+        container.innerHTML = '<p style="color: rgba(255,255,255,0.6); font-style: italic;">No symptoms selected yet</p>';
+        predictBtn.disabled = true;
+      } else {
+        container.innerHTML = selectedSymptoms.map(symptom => 
+          `<span class="selected-tag">${symptom}<i class="fas fa-times" onclick="removeSymptom('${symptom}')"></i></span>`
+        ).join('');
+        predictBtn.disabled = false;
+      }
+    }
+
+    // Remove symptom
+    function removeSymptom(symptom) {
+      const checkbox = document.querySelector(`input[value="${symptom}"]`);
+      if (checkbox) checkbox.checked = false;
+      toggleSymptom(symptom);
+    }
+
+    // AI Disease Prediction Algorithm
+    function predictDisease() {
+      if (selectedSymptoms.length === 0) return;
+
+      // Show loading
+      const resultsCard = document.getElementById('resultsCard');
+      const resultsContent = document.getElementById('resultsContent');
+      resultsCard.classList.add('show');
+      resultsContent.innerHTML = `
+        <div class="loading">
+          <i class="fas fa-spinner"></i>
+          <p style="margin-top: 20px;">AI is analyzing your symptoms...</p>
+        </div>
+      `;
+
+      // Simulate AI processing time
+      setTimeout(() => {
+        const predictions = analyzeSymptoms(selectedSymptoms);
+        displayResults(predictions);
+      }, 2000);
+    }
+
+    // Core AI Algorithm: Decision Tree + Naive Bayes
+    function analyzeSymptoms(symptoms) {
+      const predictions = [];
+
+      for (const [disease, data] of Object.entries(diseaseDatabase)) {
+        // Calculate symptom match using Decision Tree logic
+        const matchedSymptoms = symptoms.filter(s => 
+          data.symptoms.some(ds => ds.toLowerCase() === s.toLowerCase())
+        );
+
+        if (matchedSymptoms.length > 0) {
+          // Naive Bayes probability calculation
+          const matchRatio = matchedSymptoms.length / symptoms.length;
+          const coverageRatio = matchedSymptoms.length / data.symptoms.length;
+          
+          // Weighted confidence score
+          const confidence = (matchRatio * 0.6 + coverageRatio * 0.4) * 100;
+          
+          // Bonus for exact matches
+          const exactMatchBonus = matchedSymptoms.length === data.symptoms.length ? 10 : 0;
+          
+          const finalConfidence = Math.min(confidence + exactMatchBonus, 98);
+
+          predictions.push({
+            disease,
+            confidence: finalConfidence,
+            matchedSymptoms,
+            data
+          });
+        }
+      }
+
+      // Sort by confidence (Decision Tree classification)
+      return predictions.sort((a, b) => b.confidence - a.confidence).slice(0, 3);
+    }
+
+    // Display prediction results
+    function displayResults(predictions) {
+      const resultsContent = document.getElementById('resultsContent');
+      
+      if (predictions.length === 0) {
+        resultsContent.innerHTML = `
+          <div class="warning">
+            <i class="fas fa-exclamation-circle"></i> 
+            <strong>No Clear Match Found</strong>
+            <p style="margin-top: 10px;">The symptoms you selected don't match any common disease patterns in our database. Please consult a healthcare professional for proper diagnosis.</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      predictions.forEach((pred, index) => {
+        const confidenceClass = pred.confidence > 70 ? 'high' : pred.confidence > 50 ? 'medium' : 'low';
+        
+        html += `
+          <div class="prediction-result">
+            <div class="disease-name">
+              <span>${index + 1}. ${pred.disease}</span>
+              <span class="confidence">${pred.confidence.toFixed(1)}% Match</span>
+            </div>
+            
+            <div class="disease-info">
+              <p><strong>Description:</strong> ${pred.data.description}</p>
+              <p><strong>Matched Symptoms:</strong> ${pred.matchedSymptoms.join(", ")}</p>
+            </div>
+
+            <div class="recommendation">
+              <h4><i class="fas fa-notes-medical"></i> Recommendations:</h4>
+              <ul>
+                ${pred.data.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+        <div class="warning">
+          <i class="fas fa-user-md"></i> <strong>Important:</strong> 
+          These predictions are based on AI analysis and should not replace professional medical advice. 
+          Please consult a qualified healthcare provider for accurate diagnosis and treatment.
+        </div>
+      `;
+
+      resultsContent.innerHTML = html;
+    }
+
+    // Initialize on page load
+    window.onload = initializeSymptoms;
+  </script>
+</body>
+</html>

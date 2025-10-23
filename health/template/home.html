@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <title>AI Healthcare - Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+    .topnav {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .topnav a {
+      color: white;
+      text-decoration: none;
+      padding: 20px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    .topnav a:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    .logo {
+      font-size: 2rem;
+      color: #4ecdc4 !important;
+      margin-right: auto;
+      padding: 20px 30px;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 25px;
+      margin-right: 20px;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+    .main-content {
+      margin-top: 80px;
+      padding: 40px;
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .dashboard-header { text-align: center; margin-bottom: 50px; }
+    .dashboard-title {
+      font-size: 3rem;
+      color: white;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      margin-bottom: 10px;
+    }
+    .dashboard-subtitle { font-size: 1.2rem; color: rgba(255, 255, 255, 0.8); }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    .dashboard-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(31, 38, 135, 0.5);
+    }
+    .card-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: white;
+    }
+    .medical-records .card-icon { background: linear-gradient(45deg, #ff6b6b, #ff8e53); }
+    .symptoms .card-icon { background: linear-gradient(45deg, #4ecdc4, #45b7d1); }
+    .test-results .card-icon { background: linear-gradient(45deg, #96ceb4, #feca57); }
+    .appointments .card-icon { background: linear-gradient(45deg, #a8edea, #fed6e3); }
+    .card-title { font-size: 1.5rem; color: white; font-weight: 600; }
+    .card-content { color: rgba(255, 255, 255, 0.9); line-height: 1.6; }
+    .record-item {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-left: 4px solid #ff6b6b;
+      transition: all 0.3s ease;
+    }
+    .record-item:hover { background: rgba(255, 255, 255, 0.2); transform: translateX(5px); }
+    .record-date { font-size: 0.9rem; color: #4ecdc4; font-weight: 600; margin-bottom: 5px; }
+    .record-title { color: white; font-weight: 600; margin-bottom: 5px; }
+    .record-description { color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; }
+    .symptom-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+    }
+    .symptom-item:hover { background: rgba(255, 255, 255, 0.2); }
+    .symptom-name { color: white; font-weight: 500; }
+    .severity-indicator {
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .severity-low { background: #27ae60; color: white; }
+    .severity-medium { background: #f39c12; color: white; }
+    .severity-high { background: #e74c3c; color: white; }
+    .test-item {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+    }
+    .test-item:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.02); }
+    .test-name {
+      color: white;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .test-status { padding: 3px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+    .status-normal { background: #27ae60; color: white; }
+    .status-abnormal { background: #e74c3c; color: white; }
+    .status-pending { background: #f39c12; color: white; }
+    .test-value { color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; }
+    .action-buttons { display: flex; gap: 15px; margin-top: 20px; }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    .btn-primary { background: linear-gradient(45deg, #ff6b6b, #4ecdc4); color: white; }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      overflow-y: auto;
+    }
+    .modal-content {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+      margin: 5% auto;
+      padding: 40px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 800px;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+    }
+    .close {
+      color: white;
+      float: right;
+      font-size: 35px;
+      font-weight: bold;
+      cursor: pointer;
+      line-height: 20px;
+    }
+    .close:hover { color: #ff6b6b; }
+    .form-group { margin-bottom: 25px; }
+    .form-group label {
+      display: block;
+      color: white;
+      font-weight: 600;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: rgba(255, 255, 255, 0.6); }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #4ecdc4;
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .form-group textarea { min-height: 100px; resize: vertical; }
+    .form-group select { cursor: pointer; }
+    .form-group select option { background: #764ba2; color: white; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .upload-area {
+      border: 3px dashed rgba(255, 255, 255, 0.4);
+      border-radius: 15px;
+      padding: 40px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .upload-area:hover { border-color: #4ecdc4; background: rgba(255, 255, 255, 0.1); }
+    .upload-area i { font-size: 3rem; color: #4ecdc4; margin-bottom: 15px; }
+    .upload-area p { color: white; font-size: 1.1rem; margin: 10px 0; }
+    .file-name { color: #4ecdc4; font-weight: 600; margin-top: 15px; }
+    .analysis-section {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+      display: none;
+    }
+    .analysis-section h3 { color: white; margin-bottom: 15px; }
+    .analysis-content { color: rgba(255, 255, 255, 0.9); line-height: 1.8; }
+    .analysis-content ul { margin-left: 20px; margin-top: 10px; }
+    .analysis-content li { margin-bottom: 8px; }
+    .records-container { max-height: 400px; overflow-y: auto; }
+    .records-container::-webkit-scrollbar { width: 8px; }
+    .records-container::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+    .records-container::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 10px; }
+    #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; }
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+    .quick-action {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .quick-action:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-3px); }
+    .quick-action i { font-size: 2rem; margin-bottom: 15px; color: #4ecdc4; }
+    .quick-action h4 { color: white; margin-bottom: 10px; }
+    .quick-action p { color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; }
+    
+    .slider-container { margin: 15px 0; }
+    .slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.2);
+      outline: none;
+      -webkit-appearance: none;
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #4ecdc4;
+      cursor: pointer;
+    }
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #4ecdc4;
+      cursor: pointer;
+      border: none;
+    }
+    .slider-value {
+      color: white;
+      font-weight: 600;
+      font-size: 1.2rem;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .checkbox-item:hover { background: rgba(255, 255, 255, 0.15); }
+    .checkbox-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    .checkbox-item label {
+      color: white;
+      cursor: pointer;
+      margin: 0;
+      font-size: 0.95rem;
+    }
+    
+    @media (max-width: 1200px) { .dashboard-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) {
+      .main-content { padding: 20px; }
+      .dashboard-title { font-size: 2rem; }
+      .topnav { flex-direction: column; padding: 10px 0; }
+      .user-info { margin: 10px 0; }
+      .modal-content { width: 95%; margin: 10% auto; padding: 20px; }
+      .form-row { grid-template-columns: 1fr; }
+      .checkbox-group { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  <nav class="topnav">
+    <i class="fas fa-user-md logo"></i>
+    <a href="#home">Home</a>
+    <a href="#services">Services</a>
+    <div class="user-info">
+      <div class="user-avatar" id="userAvatar">U</div>
+      <span style="color: white;" id="userName">User</span>
+      <a href="#" onclick="logout()" style="color: #ff6b6b; padding: 5px 10px;">Logout</a>
+    </div>
+  </nav>
+
+  <!-- Add Record Modal -->
+  <div id="addRecordModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeAddRecordModal()">&times;</span>
+      <h2 style="color: white; margin-bottom: 30px;">Add Medical Record</h2>
+      <form id="recordForm" onsubmit="saveRecord(event)">
+        <div class="form-group">
+          <label>Upload Health Report</label>
+          <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Click to upload or drag and drop</p>
+            <p style="font-size: 0.9rem; opacity: 0.8;">Supports PDF, JPG, PNG files</p>
+            <p class="file-name" id="fileName"></p>
+          </div>
+          <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" onchange="handleFileUpload(event)">
+        </div>
+        <div class="form-group">
+          <label>Report Title *</label>
+          <input type="text" id="reportTitle" placeholder="e.g., Blood Test Results, X-Ray Report" required>
+        </div>
+        <div class="form-group">
+          <label>Report Type *</label>
+          <select id="reportType" required>
+            <option value="">Select Type</option>
+            <option value="Blood Test">Blood Test</option>
+            <option value="X-Ray">X-Ray</option>
+            <option value="MRI">MRI Scan</option>
+            <option value="CT Scan">CT Scan</option>
+            <option value="Ultrasound">Ultrasound</option>
+            <option value="ECG">ECG</option>
+            <option value="Consultation">Doctor Consultation</option>
+            <option value="Prescription">Prescription</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div id="analysisSection" class="analysis-section">
+          <h3><i class="fas fa-robot"></i> AI Analysis</h3>
+          <div class="analysis-content" id="analysisContent"></div>
+        </div>
+        <div class="action-buttons" style="margin-top: 30px;">
+          <button type="submit" class="btn btn-primary">Save Record</button>
+          <button type="button" class="btn btn-secondary" onclick="closeAddRecordModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Track Symptoms Modal -->
+  <div id="trackSymptomsModal" class="modal">
+    <div class="modal-content" style="max-width: 1000px;">
+      <span class="close" onclick="closeTrackSymptomsModal()">&times;</span>
+      <h2 style="color: white; margin-bottom: 30px;"><i class="fas fa-chart-line"></i> Symptom Tracker</h2>
+      
+      <!-- Quick Stats -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+        <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; text-align: center;">
+          <div style="font-size: 2rem; color: #4ecdc4; font-weight: bold;" id="totalSymptoms">0</div>
+          <div style="color: white; margin-top: 5px;">Total Tracked</div>
+        </div>
+        <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; text-align: center;">
+          <div style="font-size: 2rem; color: #ff6b6b; font-weight: bold;" id="avgPainLevel">0</div>
+          <div style="color: white; margin-top: 5px;">Avg Pain Level</div>
+        </div>
+        <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; text-align: center;">
+          <div style="font-size: 1.3rem; color: #feca57; font-weight: bold;" id="mostFrequent">None</div>
+          <div style="color: white; margin-top: 5px;">Most Frequent</div>
+        </div>
+        <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; text-align: center;">
+          <div style="font-size: 2rem; color: #96ceb4; font-weight: bold;" id="activeSymptoms">0</div>
+          <div style="color: white; margin-top: 5px;">Currently Active</div>
+        </div>
+      </div>
+
+      <!-- Filter Options -->
+      <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; margin-bottom: 30px;">
+        <h3 style="color: white; margin-bottom: 15px;">Filter Symptoms</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+          <select id="filterSeverity" onchange="filterSymptomHistory()" style="padding: 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: white;">
+            <option value="all">All Severities</option>
+            <option value="high">Severe Only</option>
+            <option value="medium">Moderate Only</option>
+            <option value="low">Mild Only</option>
+          </select>
+          <select id="filterType" onchange="filterSymptomHistory()" style="padding: 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: white;">
+            <option value="all">All Symptoms</option>
+          </select>
+          <button class="btn btn-secondary" onclick="resetFilters()" style="padding: 10px;">Reset Filters</button>
+        </div>
+      </div>
+
+      <!-- Timeline View -->
+      <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px;">
+        <h3 style="color: white; margin-bottom: 20px;">Symptom Timeline</h3>
+        <div id="symptomTimeline" style="max-height: 500px; overflow-y: auto;">
+          <p style="color: rgba(255, 255, 255, 0.7); text-align: center; padding: 40px;">No symptoms tracked yet. Add symptoms to see your timeline.</p>
+        </div>
+      </div>
+
+      <div class="action-buttons" style="margin-top: 30px;">
+        <button class="btn btn-primary" onclick="exportSymptomReport()">Export Report</button>
+        <button class="btn btn-secondary" onclick="closeTrackSymptomsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Symptom Modal -->
+  <div id="addSymptomModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeAddSymptomModal()">&times;</span>
+      <h2 style="color: white; margin-bottom: 30px;"><i class="fas fa-thermometer-half"></i> Add Symptom</h2>
+      <form id="symptomForm" onsubmit="saveSymptom(event)">
+        
+        <div class="form-group">
+          <label>Symptom Name *</label>
+          <select id="symptomName" required>
+            <option value="">Select Symptom</option>
+            <option value="Headache">Headache</option>
+            <option value="Fever">Fever</option>
+            <option value="Cough">Cough</option>
+            <option value="Fatigue">Fatigue</option>
+            <option value="Nausea">Nausea</option>
+            <option value="Dizziness">Dizziness</option>
+            <option value="Chest Pain">Chest Pain</option>
+            <option value="Abdominal Pain">Abdominal Pain</option>
+            <option value="Back Pain">Back Pain</option>
+            <option value="Joint Pain">Joint Pain</option>
+            <option value="Muscle Pain">Muscle Pain</option>
+            <option value="Shortness of Breath">Shortness of Breath</option>
+            <option value="Sore Throat">Sore Throat</option>
+            <option value="Sleep Issues">Sleep Issues</option>
+            <option value="Anxiety">Anxiety</option>
+            <option value="Depression">Depression</option>
+            <option value="Other">Other (specify below)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Custom Symptom (if Other)</label>
+          <input type="text" id="customSymptom" placeholder="Enter custom symptom name">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Body Part / Location</label>
+            <input type="text" id="bodyPart" placeholder="e.g., Left knee, Lower back">
+          </div>
+          <div class="form-group">
+            <label>When Started *</label>
+            <input type="datetime-local" id="startTime" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Pain/Discomfort Level: <span id="severityValue">5</span>/10</label>
+          <div class="slider-container">
+            <input type="range" min="1" max="10" value="5" class="slider" id="severitySlider" oninput="updateSeverity(this.value)">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Frequency</label>
+          <select id="frequency">
+            <option value="Constant">Constant</option>
+            <option value="Intermittent">Intermittent</option>
+            <option value="Occasional">Occasional</option>
+            <option value="Morning Only">Morning Only</option>
+            <option value="Evening Only">Evening Only</option>
+            <option value="After Meals">After Meals</option>
+            <option value="During Activity">During Activity</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Type of Pain/Sensation</label>
+          <select id="painType">
+            <option value="">Select Type</option>
+            <option value="Sharp">Sharp</option>
+            <option value="Dull">Dull</option>
+            <option value="Throbbing">Throbbing</option>
+            <option value="Burning">Burning</option>
+            <option value="Tingling">Tingling</option>
+            <option value="Stabbing">Stabbing</option>
+            <option value="Aching">Aching</option>
+            <option value="Cramping">Cramping</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Pattern/Trend</label>
+          <select id="pattern">
+            <option value="Stable">Stable (no change)</option>
+            <option value="Getting Worse">Getting Worse</option>
+            <option value="Improving">Improving</option>
+            <option value="Fluctuating">Fluctuating</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Associated Symptoms (check all that apply)</label>
+          <div class="checkbox-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="assoc1" value="Fever">
+              <label for="assoc1">Fever</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="assoc2" value="Nausea">
+              <label for="assoc2">Nausea</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="assoc3" value="Dizziness">
+              <label for="assoc3">Dizziness</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="assoc4" value="Sweating">
+              <label for="assoc4">Sweating</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="assoc5" value="Chills">
+              <label for="assoc5">Chills</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="assoc6" value="Weakness">
+              <label for="assoc6">Weakness</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Triggers (what makes it worse)</label>
+          <textarea id="triggers" placeholder="e.g., Physical activity, stress, certain foods, weather changes"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Upload Photo (if applicable)</label>
+          <div class="upload-area" onclick="document.getElementById('symptomPhoto').click()" style="padding: 30px;">
+            <i class="fas fa-camera" style="font-size: 2rem;"></i>
+            <p style="font-size: 1rem;">Upload photo of visible symptoms</p>
+            <p class="file-name" id="photoFileName"></p>
+          </div>
+          <input type="file" id="symptomPhoto" accept=".jpg,.jpeg,.png" style="display: none;" onchange="handlePhotoUpload(event)">
+        </div>
+
+        <div class="action-buttons" style="margin-top: 30px;">
+          <button type="submit" class="btn btn-primary">Save Symptom</button>
+          <button type="button" class="btn btn-secondary" onclick="closeAddSymptomModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="dashboard-header">
+      <h1 class="dashboard-title">Welcome to AI Healthcare Dashboard</h1>
+      <p class="dashboard-subtitle">Your comprehensive health management platform</p>
+    </div>
+    <div class="dashboard-grid">
+      <div class="dashboard-card medical-records">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-file-medical"></i></div>
+          <h3 class="card-title">Medical Records</h3>
+        </div>
+        <div class="card-content">
+          <div class="records-container" id="recordsContainer">
+            <div class="record-item">
+              <div class="record-date">March 15, 2025</div>
+              <div class="record-title">Annual Physical Examination</div>
+              <div class="record-description">Complete health checkup with blood work and vital signs assessment.</div>
+            </div>
+            <div class="record-item">
+              <div class="record-date">February 8, 2025</div>
+              <div class="record-title">Cardiology Consultation</div>
+              <div class="record-description">ECG and stress test results show normal heart function.</div>
+            </div>
+            <div class="record-item">
+              <div class="record-date">January 20, 2025</div>
+              <div class="record-title">Diabetes Management</div>
+              <div class="record-description">HbA1c levels monitored, medication adjusted accordingly.</div>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <button class="btn btn-primary" onclick="viewAllRecords()">View All Records</button>
+            <button class="btn btn-secondary" onclick="openAddRecordModal()">Add New Record</button>
+          </div>
+        </div>
+      </div>
+      <div class="dashboard-card symptoms">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-thermometer-half"></i></div>
+          <h3 class="card-title">Current Symptoms</h3>
+        </div>
+        <div class="card-content">
+          <div id="symptomsContainer">
+            <div class="symptom-item">
+              <span class="symptom-name">Headache</span>
+              <span class="severity-indicator severity-medium">Moderate</span>
+            </div>
+            <div class="symptom-item">
+              <span class="symptom-name">Fatigue</span>
+              <span class="severity-indicator severity-low">Mild</span>
+            </div>
+            <div class="symptom-item">
+              <span class="symptom-name">Joint Pain</span>
+              <span class="severity-indicator severity-high">Severe</span>
+            </div>
+            <div class="symptom-item">
+              <span class="symptom-name">Sleep Issues</span>
+              <span class="severity-indicator severity-medium">Moderate</span>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <button class="btn btn-primary" onclick="trackSymptoms()">Track Symptoms</button>
+            <button class="btn btn-secondary" onclick="openAddSymptomModal()">Add Symptom</button>
+          </div>
+        </div>
+      </div>
+      <div class="dashboard-card test-results">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-flask"></i></div>
+          <h3 class="card-title">Latest Test Results</h3>
+        </div>
+        <div class="card-content">
+          <div class="test-item">
+            <div class="test-name">
+              <span>Blood Glucose</span>
+              <span class="test-status status-normal">Normal</span>
+            </div>
+            <div class="test-value">95 mg/dL (Normal: 70-100 mg/dL)</div>
+          </div>
+          <div class="test-item">
+            <div class="test-name">
+              <span>Cholesterol</span>
+              <span class="test-status status-abnormal">High</span>
+            </div>
+            <div class="test-value">245 mg/dL (Normal: <200 mg/dL)</div>
+          </div>
+          <div class="test-item">
+            <div class="test-name">
+              <span>Blood Pressure</span>
+              <span class="test-status status-normal">Normal</span>
+            </div>
+            <div class="test-value">120/80 mmHg (Normal: <120/80 mmHg)</div>
+          </div>
+          <div class="test-item">
+            <div class="test-name">
+              <span>Hemoglobin A1C</span>
+              <span class="test-status status-pending">Pending</span>
+            </div>
+            <div class="test-value">Results expected by March 25, 2025</div>
+          </div>
+          <div class="action-buttons">
+            <button class="btn btn-primary" onclick="viewAllTests()">View All Results</button>
+            <button class="btn btn-secondary" onclick="scheduleTest()">Schedule Test</button>
+          </div>
+        </div>
+      </div>
+      <div class="dashboard-card appointments">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-calendar-check"></i></div>
+          <h3 class="card-title">Upcoming Appointments</h3>
+        </div>
+        <div class="card-content">
+          <div class="record-item">
+            <div class="record-date">March 28, 2025 - 10:00 AM</div>
+            <div class="record-title">Dr. Sarah Johnson - Cardiology</div>
+            <div class="record-description">Follow-up consultation for heart health monitoring.</div>
+          </div>
+          <div class="record-item">
+            <div class="record-date">April 5, 2025 - 2:30 PM</div>
+            <div class="record-title">Dr. Michael Chen - General Medicine</div>
+            <div class="record-description">Quarterly health assessment and medication review.</div>
+          </div>
+          <div class="action-buttons">
+            <button class="btn btn-primary" onclick="viewAllAppointments()">View All</button>
+            <button class="btn btn-secondary" onclick="scheduleAppointment()">Book New</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="quick-actions">
+      <div class="quick-action" onclick="emergencyContact()">
+        <i class="fas fa-ambulance"></i>
+        <h4>Emergency</h4>
+        <p>Quick access to emergency services</p>
+      </div>
+      <div class="quick-action" onclick="aiDiagnosis()">
+        <i class="fas fa-robot"></i>
+        <h4>AI Diagnosis</h4>
+        <p>ML-powered disease prediction from symptoms</p>
+      </div>
+      <div class="quick-action" onclick="medicationReminder()">
+        <i class="fas fa-pills"></i>
+        <h4>Medications</h4>
+        <p>Manage your medication schedule</p>
+      </div>
+      <div class="quick-action" onclick="healthTips()">
+        <i class="fas fa-lightbulb"></i>
+        <h4>Health Tips</h4>
+        <p>Personalized wellness advice</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    let medicalRecords = [];
+    let symptoms = [];
+    let uploadedFile = null;
+    let uploadedPhoto = null;
+
+    window.addEventListener('DOMContentLoaded', function() {
+  let currentUser = null;
+  try {
+    const userStr = localStorage.getItem('currentUser');
+    if (userStr) {
+      currentUser = JSON.parse(userStr);
+    }
+  } catch (e) {
+    console.error('Error reading user data:', e);
+  }
+  
+  if (currentUser && currentUser.name) {
+    document.getElementById('userName').textContent = currentUser.name;
+    const nameParts = currentUser.name.trim().split(' ');
+    let initials = '';
+    if (nameParts.length >= 2) {
+      initials = nameParts[0][0] + nameParts[nameParts.length - 1][0];
+    } else if (nameParts.length === 1) {
+      initials = nameParts[0][0];
+    }
+    document.getElementById('userAvatar').textContent = initials.toUpperCase();
+  } else {
+    document.getElementById('userName').textContent = 'User';
+    document.getElementById('userAvatar').textContent = 'U';
+  }
+  
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  document.getElementById('startTime').value = now.toISOString().slice(0, 16);
+});
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 50, density: { enable: true, value_area: 800 } },
+        color: { value: "#ffffff" },
+        shape: { type: "circle", stroke: { width: 0, color: "#000000" }, polygon: { nb_sides: 5 } },
+        opacity: { value: 0.3, random: false, anim: { enable: false, speed: 1, opacity_min: 0.1, sync: false } },
+        size: { value: 3, random: true, anim: { enable: false, speed: 40, size_min: 0.1, sync: false } },
+        line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.2, width: 1 },
+        move: {
+          enable: true, speed: 2, direction: "none", random: false, straight: false,
+          out_mode: "out", bounce: false, attract: { enable: false, rotateX: 600, rotateY: 1200 }
+        }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+        modes: {
+          grab: { distance: 400, line_linked: { opacity: 1 } },
+          bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 },
+          repulse: { distance: 100, duration: 0.4 },
+          push: { particles_nb: 4 },
+          remove: { particles_nb: 2 }
+        }
+      },
+      retina_detect: true
+    });
+
+    function openAddRecordModal() {
+      document.getElementById('addRecordModal').style.display = 'block';
+    }
+
+    function closeAddRecordModal() {
+      document.getElementById('addRecordModal').style.display = 'none';
+      document.getElementById('recordForm').reset();
+      document.getElementById('fileName').textContent = '';
+      document.getElementById('analysisSection').style.display = 'none';
+      uploadedFile = null;
+    }
+
+    function openAddSymptomModal() {
+      document.getElementById('addSymptomModal').style.display = 'block';
+    }
+
+    function closeAddSymptomModal() {
+      document.getElementById('addSymptomModal').style.display = 'none';
+      document.getElementById('symptomForm').reset();
+      document.getElementById('photoFileName').textContent = '';
+      document.getElementById('severityValue').textContent = '5';
+      document.getElementById('severitySlider').value = 5;
+      uploadedPhoto = null;
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        uploadedFile = file;
+        document.getElementById('fileName').textContent = 'File: ' + file.name;
+        setTimeout(() => { simulateAIAnalysis(file.name); }, 1000);
+      }
+    }
+
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        uploadedPhoto = file;
+        document.getElementById('photoFileName').textContent = 'Photo: ' + file.name;
+      }
+    }
+
+    function updateSeverity(value) {
+      document.getElementById('severityValue').textContent = value;
+    }
+
+    function simulateAIAnalysis(fileName) {
+      const analysisSection = document.getElementById('analysisSection');
+      const analysisContent = document.getElementById('analysisContent');
+      analysisSection.style.display = 'block';
+      analysisContent.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Analyzing document...</p>';
+      setTimeout(() => {
+        analysisContent.innerHTML = `
+          <p><strong>Document analyzed successfully!</strong></p>
+          <p style="margin-top: 10px;">Please review the findings and add any specific information about:</p>
+          <ul style="margin-left: 20px; margin-top: 10px;">
+            <li>Key test values or observations from the report</li>
+            <li>Doctor's recommendations</li>
+            <li>Precautions to follow</li>
+            <li>Medications prescribed (if any)</li>
+            <li>Follow-up requirements</li>
+          </ul>
+          <p style="margin-top: 10px; font-style: italic; opacity: 0.8;">Note: Fill in the sections below with information from your report.</p>
+        `;
+      }, 2000);
+    }
+
+    function saveRecord(event) {
+      event.preventDefault();
+      const title = document.getElementById('reportTitle').value;
+      const type = document.getElementById('reportType').value;
+      const findings = document.getElementById('keyFindings').value;
+      const precautions = document.getElementById('precautions').value;
+      const today = new Date();
+      const dateStr = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      const newRecord = {
+        date: dateStr,
+        title: title,
+        type: type,
+        description: findings || 'Health report uploaded and reviewed.',
+        precautions: precautions,
+        fileName: uploadedFile ? uploadedFile.name : null
+      };
+      medicalRecords.unshift(newRecord);
+      const recordsContainer = document.getElementById('recordsContainer');
+      const recordHTML = `
+        <div class="record-item">
+          <div class="record-date">${newRecord.date}</div>
+          <div class="record-title">${newRecord.title}${newRecord.fileName ? ' <i class="fas fa-paperclip"></i>' : ''}</div>
+          <div class="record-description">${newRecord.description}</div>
+          ${newRecord.precautions ? '<div class="record-description" style="margin-top: 8px;"><strong>Precautions:</strong> ' + newRecord.precautions + '</div>' : ''}
+        </div>
+      `;
+      recordsContainer.insertAdjacentHTML('afterbegin', recordHTML);
+      closeAddRecordModal();
+      alert('Medical record added successfully!');
+    }
+
+    function saveSymptom(event) {
+      event.preventDefault();
+      
+      const symptomName = document.getElementById('symptomName').value;
+      const customSymptom = document.getElementById('customSymptom').value;
+      const finalSymptomName = symptomName === 'Other' ? customSymptom : symptomName;
+      const severity = parseInt(document.getElementById('severitySlider').value);
+      
+      let severityClass = 'severity-low';
+      let severityText = 'Mild';
+      if (severity >= 7) {
+        severityClass = 'severity-high';
+        severityText = 'Severe';
+      } else if (severity >= 4) {
+        severityClass = 'severity-medium';
+        severityText = 'Moderate';
+      }
+      
+      const associatedSymptoms = [];
+      document.querySelectorAll('.checkbox-item input[type="checkbox"]:checked').forEach(cb => {
+        associatedSymptoms.push(cb.value);
+      });
+      
+      const newSymptom = {
+        name: finalSymptomName,
+        severity: severity,
+        severityText: severityText,
+        severityClass: severityClass,
+        bodyPart: document.getElementById('bodyPart').value,
+        startTime: document.getElementById('startTime').value,
+        frequency: document.getElementById('frequency').value,
+        painType: document.getElementById('painType').value,
+        pattern: document.getElementById('pattern').value,
+        associatedSymptoms: associatedSymptoms,
+        triggers: document.getElementById('triggers').value,
+        relief: document.getElementById('relief').value,
+        impact: document.getElementById('impact').value,
+        notes: document.getElementById('additionalNotes').value,
+        photo: uploadedPhoto ? uploadedPhoto.name : null
+      };
+      
+      symptoms.unshift(newSymptom);
+      
+      const symptomsContainer = document.getElementById('symptomsContainer');
+      const symptomHTML = `
+        <div class="symptom-item">
+          <span class="symptom-name">${newSymptom.name}${newSymptom.photo ? ' <i class="fas fa-camera"></i>' : ''}</span>
+          <span class="severity-indicator ${newSymptom.severityClass}">${newSymptom.severityText}</span>
+        </div>
+      `;
+      symptomsContainer.insertAdjacentHTML('afterbegin', symptomHTML);
+      
+      closeAddSymptomModal();
+      alert('Symptom added successfully!');
+    }
+
+    function trackSymptoms() { 
+      openTrackSymptomsModal();
+    }
+
+    function openTrackSymptomsModal() {
+      document.getElementById('trackSymptomsModal').style.display = 'block';
+      updateSymptomStats();
+      populateSymptomFilters();
+      displaySymptomTimeline();
+    }
+
+    function closeTrackSymptomsModal() {
+      document.getElementById('trackSymptomsModal').style.display = 'none';
+    }
+
+    function updateSymptomStats() {
+      const defaultSymptomsCount = 4;
+      const totalCount = symptoms.length + defaultSymptomsCount;
+      
+      document.getElementById('totalSymptoms').textContent = totalCount;
+      
+      let totalPain = 5 + 3 + 8 + 5;
+      symptoms.forEach(s => totalPain += s.severity);
+      const avgPain = (totalPain / totalCount).toFixed(1);
+      document.getElementById('avgPainLevel').textContent = avgPain;
+      
+      const symptomCount = {
+        'Headache': 1,
+        'Fatigue': 1,
+        'Joint Pain': 1,
+        'Sleep Issues': 1
+      };
+      symptoms.forEach(s => {
+        symptomCount[s.name] = (symptomCount[s.name] || 0) + 1;
+      });
+      
+      let mostFrequent = 'None';
+      let maxCount = 0;
+      for (const [name, count] of Object.entries(symptomCount)) {
+        if (count > maxCount) {
+          maxCount = count;
+          mostFrequent = name;
+        }
+      }
+      document.getElementById('mostFrequent').textContent = mostFrequent;
+      
+      document.getElementById('activeSymptoms').textContent = totalCount;
+    }
+
+    function populateSymptomFilters() {
+      const filterType = document.getElementById('filterType');
+      const symptomTypes = new Set(['Headache', 'Fatigue', 'Joint Pain', 'Sleep Issues']);
+      symptoms.forEach(s => symptomTypes.add(s.name));
+      
+      filterType.innerHTML = '<option value="all">All Symptoms</option>';
+      symptomTypes.forEach(type => {
+        filterType.innerHTML += `<option value="${type}">${type}</option>`;
+      });
+    }
+
+    function displaySymptomTimeline() {
+      const timeline = document.getElementById('symptomTimeline');
+      
+      const defaultSymptoms = [
+        {
+          name: 'Headache',
+          severity: 5,
+          severityText: 'Moderate',
+          severityClass: 'severity-medium',
+          startTime: '2025-10-04T14:30',
+          frequency: 'Intermittent',
+          pattern: 'Stable',
+          impact: 'Mild'
+        },
+        {
+          name: 'Fatigue',
+          severity: 3,
+          severityText: 'Mild',
+          severityClass: 'severity-low',
+          startTime: '2025-10-03T09:00',
+          frequency: 'Constant',
+          pattern: 'Getting Worse',
+          impact: 'Moderate'
+        },
+        {
+          name: 'Joint Pain',
+          severity: 8,
+          severityText: 'Severe',
+          severityClass: 'severity-high',
+          startTime: '2025-10-02T16:45',
+          frequency: 'Constant',
+          pattern: 'Getting Worse',
+          impact: 'Severe'
+        },
+        {
+          name: 'Sleep Issues',
+          severity: 5,
+          severityText: 'Moderate',
+          severityClass: 'severity-medium',
+          startTime: '2025-10-01T22:00',
+          frequency: 'Occasional',
+          pattern: 'Fluctuating',
+          impact: 'Moderate'
+        }
+      ];
+      
+      const allSymptoms = [...symptoms, ...defaultSymptoms];
+      
+      if (allSymptoms.length === 0) {
+        timeline.innerHTML = '<p style="color: rgba(255, 255, 255, 0.7); text-align: center; padding: 40px;">No symptoms tracked yet. Add symptoms to see your timeline.</p>';
+        return;
+      }
+      
+      allSymptoms.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+      
+      let html = '';
+      allSymptoms.forEach((symptom, index) => {
+        const date = new Date(symptom.startTime);
+        const dateStr = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        
+        html += `
+          <div class="symptom-timeline-item" style="background: rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 20px; margin-bottom: 15px; border-left: 4px solid ${symptom.severity >= 7 ? '#e74c3c' : symptom.severity >= 4 ? '#f39c12' : '#27ae60'}; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.15)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+              <div>
+                <h4 style="color: white; font-size: 1.2rem; margin-bottom: 5px;">${symptom.name}${symptom.photo ? ' <i class="fas fa-camera" style="font-size: 0.9rem; color: #4ecdc4;"></i>' : ''}</h4>
+                <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">
+                  <i class="fas fa-clock"></i> ${dateStr} at ${timeStr}
+                </div>
+              </div>
+              <span class="severity-indicator ${symptom.severityClass}">${symptom.severityText}</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+              <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px;">
+                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; margin-bottom: 3px;">Pain Level</div>
+                <div style="color: white; font-weight: 600;">${symptom.severity}/10</div>
+              </div>
+              ${symptom.frequency ? `
+              <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px;">
+                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; margin-bottom: 3px;">Frequency</div>
+                <div style="color: white; font-weight: 600;">${symptom.frequency}</div>
+              </div>
+              ` : ''}
+              ${symptom.pattern ? `
+              <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px;">
+                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; margin-bottom: 3px;">Pattern</div>
+                <div style="color: white; font-weight: 600;">${symptom.pattern}</div>
+              </div>
+              ` : ''}
+              ${symptom.impact ? `
+              <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px;">
+                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; margin-bottom: 3px;">Impact</div>
+                <div style="color: white; font-weight: 600;">${symptom.impact}</div>
+              </div>
+              ` : ''}
+            </div>
+            
+            ${symptom.bodyPart ? `
+            <div style="margin-top: 12px; color: rgba(255, 255, 255, 0.8);">
+              <i class="fas fa-map-marker-alt" style="color: #4ecdc4;"></i> <strong>Location:</strong> ${symptom.bodyPart}
+            </div>
+            ` : ''}
+            
+            ${symptom.painType ? `
+            <div style="margin-top: 8px; color: rgba(255, 255, 255, 0.8);">
+              <i class="fas fa-bolt" style="color: #feca57;"></i> <strong>Type:</strong> ${symptom.painType}
+            </div>
+            ` : ''}
+            
+            ${symptom.triggers ? `
+            <div style="margin-top: 8px; color: rgba(255, 255, 255, 0.8);">
+              <i class="fas fa-exclamation-triangle" style="color: #ff6b6b;"></i> <strong>Triggers:</strong> ${symptom.triggers}
+            </div>
+            ` : ''}
+            
+            ${symptom.relief ? `
+            <div style="margin-top: 8px; color: rgba(255, 255, 255, 0.8);">
+              <i class="fas fa-check-circle" style="color: #27ae60;"></i> <strong>Relief:</strong> ${symptom.relief}
+            </div>
+            ` : ''}
+            
+            ${symptom.associatedSymptoms && symptom.associatedSymptoms.length > 0 ? `
+            <div style="margin-top: 12px;">
+              <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; margin-bottom: 5px;">Associated Symptoms:</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                ${symptom.associatedSymptoms.map(as => `<span style="background: rgba(78, 205, 196, 0.2); color: #4ecdc4; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem;">${as}</span>`).join('')}
+              </div>
+            </div>
+            ` : ''}
+            
+            ${symptom.notes ? `
+            <div style="margin-top: 12px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">
+              <i class="fas fa-sticky-note" style="color: #feca57;"></i> ${symptom.notes}
+            </div>
+            ` : ''}
+          </div>
+        `;
+      });
+      
+      timeline.innerHTML = html;
+    }
+
+    function filterSymptomHistory() {
+      const severityFilter = document.getElementById('filterSeverity').value;
+      const typeFilter = document.getElementById('filterType').value;
+      
+      const items = document.querySelectorAll('.symptom-timeline-item');
+      items.forEach(item => {
+        let show = true;
+        
+        if (severityFilter !== 'all') {
+          const hasClass = item.querySelector(`.severity-${severityFilter}`);
+          if (!hasClass) show = false;
+        }
+        
+        if (typeFilter !== 'all') {
+          const title = item.querySelector('h4').textContent;
+          if (!title.includes(typeFilter)) show = false;
+        }
+        
+        item.style.display = show ? 'block' : 'none';
+      });
+    }
+
+    function resetFilters() {
+      document.getElementById('filterSeverity').value = 'all';
+      document.getElementById('filterType').value = 'all';
+      filterSymptomHistory();
+    }
+
+    function exportSymptomReport() {
+      alert('Generating symptom report...\n\nThis report would include:\n• Complete symptom timeline\n• Statistics and trends\n• Severity analysis\n• Recommendations for doctor visit\n\nReport would be exported as PDF.');
+    }
+
+    function viewAllRecords() {
+      if (medicalRecords.length === 0) {
+        alert('Showing default medical records. Add new records using "Add New Record" button.');
+      } else {
+        alert('Total records: ' + (medicalRecords.length + 3) + ' (including ' + medicalRecords.length + ' newly added)');
+      }
+    }
+
+    function viewAllTests() { alert('Redirecting to Test Results page...'); }
+    function scheduleTest() { window.location.href = 'schedule-test.html'}
+    function viewAllAppointments() { alert('Redirecting to Appointments page...'); }
+    function scheduleAppointment() { window.location.href = 'book-appointment.html';}
+    function emergencyContact() { alert('Emergency services contacted! Help is on the way.'); }
+    function aiDiagnosis() { window.location.href = 'ai-disease-predictor.html'; }
+
+    function brainCancerDetection() {
+      alert('Brain Cancer Detection - Coming Soon!\nThis will use CNN-based image analysis.');
+    }
+
+    function heartDiseasePredictor() {
+      alert('Heart Disease Predictor - Coming Soon!\nThis will use Logistic Regression ML.');
+    }
+
+    function diabetesPrediction() {
+      alert('Diabetes Prediction - Coming Soon!\nThis will use Random Forest algorithm.');
+    }
+
+    function skinCancerDetection() {
+      alert('Skin Cancer Detection - Coming Soon!\nThis will use Deep Learning CNN.');
+    }
+
+    function lungDiseaseDetection() {
+      alert('Lung Disease Detection - Coming Soon!\nThis will use X-Ray analysis with ML.');
+    }
+
+    function liverDiseasePredictor() {
+      alert('Liver Disease Predictor - Coming Soon!\nThis will use Neural Network.');
+    }
+
+    function medicationReminder() { alert('Opening Medication Manager...'); }
+    function healthTips() { alert('Loading personalized health tips...'); }
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        window.location.href = 'login.html';
+      }
+    }
+
+    window.onclick = function(event) {
+      const recordModal = document.getElementById('addRecordModal');
+      const symptomModal = document.getElementById('addSymptomModal');
+      const trackModal = document.getElementById('trackSymptomsModal');
+      if (event.target == recordModal) { closeAddRecordModal(); }
+      if (event.target == symptomModal) { closeAddSymptomModal(); }
+      if (event.target == trackModal) { closeTrackSymptomsModal(); }
+    }
+  </script>
+</body>
+</html>

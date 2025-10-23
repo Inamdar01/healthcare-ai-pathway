@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <title>Book Appointment - AI Healthcare</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+    .topnav {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .topnav a {
+      color: white;
+      text-decoration: none;
+      padding: 20px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    .topnav a:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    .logo {
+      font-size: 2rem;
+      color: #4ecdc4 !important;
+      margin-right: auto;
+      padding: 20px 30px;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 25px;
+      margin-right: 20px;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+    .main-content {
+      margin-top: 80px;
+      padding: 40px;
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .page-title {
+      font-size: 2.5rem;
+      color: white;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      margin-bottom: 10px;
+    }
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .content-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+    .content-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .full-width {
+      grid-column: 1 / -1;
+    }
+    .card-title {
+      color: white;
+      font-size: 1.5rem;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-title i {
+      color: #4ecdc4;
+    }
+    .specialization-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .specialization-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    .specialization-card:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-3px);
+      border-color: rgba(78, 205, 196, 0.5);
+    }
+    .specialization-card.selected {
+      background: rgba(78, 205, 196, 0.2);
+      border-color: #4ecdc4;
+    }
+    .specialization-icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      color: #4ecdc4;
+    }
+    .specialization-name {
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .doctor-list {
+      display: none;
+      margin-top: 20px;
+    }
+    .doctor-list.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .doctor-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 15px;
+      display: flex;
+      gap: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    .doctor-card:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+    }
+    .doctor-card.selected {
+      background: rgba(78, 205, 196, 0.2);
+      border-color: #4ecdc4;
+    }
+    .doctor-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: white;
+      flex-shrink: 0;
+    }
+    .doctor-info {
+      flex: 1;
+    }
+    .doctor-name {
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .doctor-specialization {
+      color: #4ecdc4;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+    .doctor-details {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .doctor-rating {
+      color: #feca57;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      color: white;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #4ecdc4;
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .form-group select option {
+      background: #764ba2;
+      color: white;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .time-slots {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .time-slot {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    .time-slot:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+    .time-slot.selected {
+      background: rgba(78, 205, 196, 0.3);
+      border-color: #4ecdc4;
+      color: #4ecdc4;
+    }
+    .time-slot.booked {
+      background: rgba(255, 107, 107, 0.2);
+      border-color: #ff6b6b;
+      color: rgba(255, 255, 255, 0.5);
+      cursor: not-allowed;
+    }
+    .appointment-summary {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 25px;
+      margin-top: 20px;
+    }
+    .summary-title {
+      color: white;
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.9);
+    }
+    .summary-label {
+      font-weight: 500;
+    }
+    .summary-value {
+      color: #4ecdc4;
+      font-weight: 600;
+    }
+    .consultation-fee {
+      background: rgba(78, 205, 196, 0.2);
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .fee-label {
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .fee-amount {
+      color: #4ecdc4;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+      justify-content: center;
+    }
+    .btn {
+      padding: 15px 40px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    .btn-primary {
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      color: white;
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .info-banner {
+      background: rgba(78, 205, 196, 0.2);
+      border-left: 4px solid #4ecdc4;
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      color: white;
+    }
+    .info-banner i {
+      color: #4ecdc4;
+      margin-right: 10px;
+    }
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+    .confirmation-modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      overflow-y: auto;
+    }
+    .confirmation-content {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+      margin: 10% auto;
+      padding: 40px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+      text-align: center;
+      animation: slideIn 0.5s ease;
+    }
+    @keyframes slideIn {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .confirmation-icon {
+      font-size: 4rem;
+      color: #4ecdc4;
+      margin-bottom: 20px;
+      animation: scaleIn 0.5s ease 0.2s both;
+    }
+    @keyframes scaleIn {
+      from { transform: scale(0); }
+      to { transform: scale(1); }
+    }
+    .confirmation-title {
+      color: white;
+      font-size: 2rem;
+      margin-bottom: 15px;
+    }
+    .confirmation-message {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+    .appointment-details-box {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 25px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    .detail-label {
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .detail-value {
+      font-weight: 600;
+      color: #4ecdc4;
+    }
+    @media (max-width: 1024px) {
+      .content-wrapper {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 768px) {
+      .main-content { padding: 20px; }
+      .page-title { font-size: 2rem; }
+      .topnav { flex-direction: column; padding: 10px 0; }
+      .user-info { margin: 10px 0; }
+      .form-row { grid-template-columns: 1fr; }
+      .specialization-grid { grid-template-columns: repeat(2, 1fr); }
+      .content-card { padding: 20px; }
+      .action-buttons { flex-direction: column; }
+      .btn { width: 100%; }
+      .doctor-card { flex-direction: column; text-align: center; }
+      .doctor-avatar { margin: 0 auto; }
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  
+  <nav class="topnav">
+    <i class="fas fa-user-md logo"></i>
+    <a href="home.html">Dashboard</a>
+    <a href="#services">Services</a>
+    <div class="user-info">
+      <div class="user-avatar" id="userAvatar">U</div>
+      <span style="color: white;" id="userName">User</span>
+      <a href="#" onclick="logout()" style="color: #ff6b6b; padding: 5px 10px;">Logout</a>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title"><i class="fas fa-calendar-plus"></i> Book Appointment</h1>
+      <p class="page-subtitle">Schedule a consultation with our experienced doctors</p>
+    </div>
+
+    <div class="content-wrapper">
+      <!-- Select Specialization -->
+      <div class="content-card full-width">
+        <h3 class="card-title"><i class="fas fa-stethoscope"></i> Select Specialization</h3>
+        <div class="info-banner">
+          <i class="fas fa-info-circle"></i>
+          <strong>How it works:</strong> Choose a specialization → Select a doctor → Pick date & time → Confirm booking
+        </div>
+        <div class="specialization-grid">
+          <div class="specialization-card" onclick="selectSpecialization('cardiology')">
+            <div class="specialization-icon"><i class="fas fa-heartbeat"></i></div>
+            <div class="specialization-name">Cardiology</div>
+          </div>
+          <div class="specialization-card" onclick="selectSpecialization('general')">
+            <div class="specialization-icon"><i class="fas fa-user-md"></i></div>
+            <div class="specialization-name">General Medicine</div>
+          </div>
+          <div class="specialization-card" onclick="selectSpecialization('orthopedics')">
+            <div class="specialization-icon"><i class="fas fa-bone"></i></div>
+            <div class="specialization-name">Orthopedics</div>
+          </div>
+          <div class="specialization-card" onclick="selectSpecialization('dermatology')">
+            <div class="specialization-icon"><i class="fas fa-hand-sparkles"></i></div>
+            <div class="specialization-name">Dermatology</div>
+          </div>
+          <div class="specialization-card" onclick="selectSpecialization('pediatrics')">
+            <div class="specialization-icon"><i class="fas fa-baby"></i></div>
+            <div class="specialization-name">Pediatrics</div>
+          </div>
+          <div class="specialization-card" onclick="selectSpecialization('neurology')">
+            <div class="specialization-icon"><i class="fas fa-brain"></i></div>
+            <div class="specialization-name">Neurology</div>
+          </div>
+          <div class="specialization-card" onclick="selectSpecialization('gynecology')">
+            <div class="specialization-icon"><i class="fas fa-female"></i></div>
+            <div class="specialization-name">Gynecology</div>
+          </div>
+          <div class="specialization-card" onclick="selectSpecialization('ent')">
+            <div class="specialization-icon"><i class="fas fa-ear-listen"></i></div>
+            <div class="specialization-name">ENT</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Available Doctors -->
+      <div class="content-card" id="doctorsSection" style="display: none;">
+        <h3 class="card-title"><i class="fas fa-user-doctor"></i> Available Doctors</h3>
+        <div id="doctorsList"></div>
+      </div>
+
+      <!-- Appointment Details -->
+      <div class="content-card" id="appointmentSection" style="display: none;">
+        <h3 class="card-title"><i class="fas fa-calendar-check"></i> Appointment Details</h3>
+        
+        <div class="form-group">
+          <label>Appointment Date *</label>
+          <input type="date" id="appointmentDate" onchange="generateTimeSlots()">
+        </div>
+
+        <div class="form-group">
+          <label>Select Time Slot *</label>
+          <div class="time-slots" id="timeSlots"></div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Patient Name *</label>
+            <input type="text" id="patientName" placeholder="Enter full name" onchange="updateSummary()">
+          </div>
+          <div class="form-group">
+            <label>Age *</label>
+            <input type="number" id="patientAge" placeholder="Enter age" onchange="updateSummary()">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone Number *</label>
+            <input type="tel" id="patientPhone" placeholder="Enter phone number" onchange="updateSummary()">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="patientEmail" placeholder="Enter email" onchange="updateSummary()">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Appointment Type *</label>
+          <select id="appointmentType" onchange="updateSummary()">
+            <option value="">Select Type</option>
+            <option value="first">First Consultation</option>
+            <option value="followup">Follow-up Visit</option>
+            <option value="emergency">Emergency</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Reason for Visit *</label>
+          <textarea id="reasonForVisit" rows="3" placeholder="Briefly describe your symptoms or reason for consultation"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Medical History (Optional)</label>
+          <textarea id="medicalHistory" rows="2" placeholder="Any chronic conditions, allergies, or current medications"></textarea>
+        </div>
+      </div>
+
+      <!-- Appointment Summary -->
+      <div class="content-card full-width" id="summarySection" style="display: none;">
+        <h3 class="card-title"><i class="fas fa-file-invoice"></i> Appointment Summary</h3>
+        
+        <div class="appointment-summary">
+          <div class="summary-title">Booking Details</div>
+          
+          <div class="summary-item">
+            <span class="summary-label">Doctor:</span>
+            <span class="summary-value" id="summaryDoctor">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Specialization:</span>
+            <span class="summary-value" id="summarySpecialization">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Date:</span>
+            <span class="summary-value" id="summaryDate">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Time:</span>
+            <span class="summary-value" id="summaryTime">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Patient:</span>
+            <span class="summary-value" id="summaryPatient">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Type:</span>
+            <span class="summary-value" id="summaryType">-</span>
+          </div>
+
+          <div class="consultation-fee">
+            <span class="fee-label">Consultation Fee:</span>
+            <span class="fee-amount" id="consultationFee">₹0</span>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn btn-primary" id="confirmBtn" onclick="confirmAppointment()" disabled>
+            <i class="fas fa-check-circle"></i> Confirm Booking
+          </button>
+          <a href="home.html" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmationModal" class="confirmation-modal">
+    <div class="confirmation-content">
+      <div class="confirmation-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h2 class="confirmation-title">Appointment Confirmed!</h2>
+      <p class="confirmation-message">Your appointment has been successfully booked. You will receive a confirmation email shortly.</p>
+      
+      <div class="appointment-details-box">
+        <div class="detail-row">
+          <span class="detail-label">Appointment ID:</span>
+          <span class="detail-value" id="confirmAppointmentId">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Doctor:</span>
+          <span class="detail-value" id="confirmDoctor">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Date & Time:</span>
+          <span class="detail-value" id="confirmDateTime">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Patient:</span>
+          <span class="detail-value" id="confirmPatient">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Consultation Fee:</span>
+          <span class="detail-value" id="confirmFee">-</span>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <a href="home.html" class="btn btn-primary">
+          <i class="fas fa-home"></i> Back to Dashboard
+        </a>
+        <button class="btn btn-secondary" onclick="closeConfirmation()">
+          <i class="fas fa-plus"></i> Book Another
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    let selectedSpecialization = null;
+    let selectedDoctor = null;
+    let selectedTime = null;
+
+    const doctors = {
+      cardiology: [
+        { name: 'Dr. Sarah Johnson', experience: '15 years', rating: '4.9', fee: 800, avatar: 'SJ' },
+        { name: 'Dr. Rajesh Kumar', experience: '12 years', rating: '4.8', fee: 750, avatar: 'RK' },
+        { name: 'Dr. Emily Chen', experience: '18 years', rating: '5.0', fee: 900, avatar: 'EC' }
+      ],
+      general: [
+        { name: 'Dr. Michael Chen', experience: '10 years', rating: '4.7', fee: 500, avatar: 'MC' },
+        { name: 'Dr. Priya Sharma', experience: '8 years', rating: '4.6', fee: 450, avatar: 'PS' },
+        { name: 'Dr. David Wilson', experience: '14 years', rating: '4.8', fee: 600, avatar: 'DW' }
+      ],
+      orthopedics: [
+        { name: 'Dr. James Anderson', experience: '20 years', rating: '4.9', fee: 850, avatar: 'JA' },
+        { name: 'Dr. Anjali Patel', experience: '11 years', rating: '4.7', fee: 700, avatar: 'AP' }
+      ],
+      dermatology: [
+        { name: 'Dr. Lisa Martinez', experience: '9 years', rating: '4.8', fee: 650, avatar: 'LM' },
+        { name: 'Dr. Amit Verma', experience: '13 years', rating: '4.9', fee: 750, avatar: 'AV' }
+      ],
+      pediatrics: [
+        { name: 'Dr. Jennifer Lee', experience: '16 years', rating: '5.0', fee: 700, avatar: 'JL' },
+        { name: 'Dr. Rohan Gupta', experience: '10 years', rating: '4.7', fee: 600, avatar: 'RG' }
+      ],
+      neurology: [
+        { name: 'Dr. Robert Taylor', experience: '22 years', rating: '5.0', fee: 1000, avatar: 'RT' },
+        { name: 'Dr. Meera Reddy', experience: '14 years', rating: '4.8', fee: 850, avatar: 'MR' }
+      ],
+      gynecology: [
+        { name: 'Dr. Amanda Clark', experience: '17 years', rating: '4.9', fee: 800, avatar: 'AC' },
+        { name: 'Dr. Kavita Singh', experience: '12 years', rating: '4.8', fee: 700, avatar: 'KS' }
+      ],
+      ent: [
+        { name: 'Dr. Thomas Brown', experience: '11 years', rating: '4.7', fee: 600, avatar: 'TB' },
+        { name: 'Dr. Sneha Iyer', experience: '9 years', rating: '4.6', fee: 550, avatar: 'SI' }
+      ]
+    };
+
+    window.addEventListener('DOMContentLoaded', function() {
+  let currentUser = null;
+  try {
+    const userStr = localStorage.getItem('currentUser');
+    if (userStr) {
+      currentUser = JSON.parse(userStr);
+    }
+  } catch (e) {
+    console.error('Error reading user data:', e);
+  }
+  
+  if (currentUser && currentUser.name) {
+    document.getElementById('userName').textContent = currentUser.name;
+    const nameParts = currentUser.name.trim().split(' ');
+    let initials = '';
+    if (nameParts.length >= 2) {
+      initials = nameParts[0][0] + nameParts[nameParts.length - 1][0];
+    } else if (nameParts.length === 1) {
+      initials = nameParts[0][0];
+    }
+    document.getElementById('userAvatar').textContent = initials.toUpperCase();
+  } else {
+    document.getElementById('userName').textContent = 'User';
+    document.getElementById('userAvatar').textContent = 'U';
+  }
+  
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  document.getElementById('startTime').value = now.toISOString().slice(0, 16);
+});
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 50, density: { enable: true, value_area: 800 } },
+        color: { value: "#ffffff" },
+        shape: { type: "circle" },
+        opacity: { value: 0.3, random: false },
+        size: { value: 3, random: true },
+        line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.2, width: 1 },
+        move: { enable: true, speed: 2, direction: "none", random: false, straight: false, out_mode: "out" }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+        modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
+      },
+      retina_detect: true
+    });
+
+    function selectSpecialization(spec) {
+      selectedSpecialization = spec;
+      
+      document.querySelectorAll('.specialization-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      event.target.closest('.specialization-card').classList.add('selected');
+      
+      const doctorsSection = document.getElementById('doctorsSection');
+      doctorsSection.style.display = 'block';
+      
+      const doctorsList = document.getElementById('doctorsList');
+      doctorsList.innerHTML = '';
+      
+      const specName = spec.charAt(0).toUpperCase() + spec.slice(1);
+      
+      doctors[spec].forEach(doctor => {
+        doctorsList.innerHTML += `
+          <div class="doctor-card" onclick="selectDoctor('${doctor.name}', '${specName}', ${doctor.fee}, '${doctor.avatar}')">
+            <div class="doctor-avatar">${doctor.avatar}</div>
+            <div class="doctor-info">
+              <div class="doctor-name">${doctor.name}</div>
+              <div class="doctor-specialization">${specName} Specialist</div>
+              <div class="doctor-details">
+                <span><i class="fas fa-briefcase"></i> ${doctor.experience}</span>
+                <span class="doctor-rating"><i class="fas fa-star"></i> ${doctor.rating}/5</span>
+                <span><i class="fas fa-rupee-sign"></i> ${doctor.fee}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      doctorsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function selectDoctor(name, spec, fee, avatar) {
+      selectedDoctor = { name, spec, fee, avatar };
+      
+      document.querySelectorAll('.doctor-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      event.target.closest('.doctor-card').classList.add('selected');
+      
+      document.getElementById('appointmentSection').style.display = 'block';
+      document.getElementById('summarySection').style.display = 'block';
+      
+      document.getElementById('summaryDoctor').textContent = name;
+      document.getElementById('summarySpecialization').textContent = spec;
+      document.getElementById('consultationFee').textContent = '₹' + fee;
+      
+      updateSummary();
+      
+      setTimeout(() => {
+        document.getElementById('appointmentSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+    }
+
+    function generateTimeSlots() {
+      const date = document.getElementById('appointmentDate').value;
+      if (!date) return;
+      
+      const timeSlots = document.getElementById('timeSlots');
+      timeSlots.innerHTML = '';
+      
+      const slots = [
+        '09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
+        '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM', '04:00 PM', '04:30 PM',
+        '05:00 PM', '05:30 PM', '06:00 PM'
+      ];
+      
+      const bookedSlots = ['10:00 AM', '03:00 PM', '05:30 PM'];
+      
+      slots.forEach(slot => {
+        const isBooked = bookedSlots.includes(slot);
+        const slotClass = isBooked ? 'time-slot booked' : 'time-slot';
+        const onclick = isBooked ? '' : `onclick="selectTimeSlot('${slot}')"`;
+        
+        timeSlots.innerHTML += `
+          <div class="${slotClass}" ${onclick}>
+            ${slot}
+          </div>
+        `;
+      });
+      
+      document.getElementById('summaryDate').textContent = new Date(date).toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      
+      updateSummary();
+    }
+
+    function selectTimeSlot(time) {
+      selectedTime = time;
+      
+      document.querySelectorAll('.time-slot').forEach(slot => {
+        slot.classList.remove('selected');
+      });
+      event.target.classList.add('selected');
+      
+      document.getElementById('summaryTime').textContent = time;
+      
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const patientName = document.getElementById('patientName').value;
+      const appointmentType = document.getElementById('appointmentType').value;
+      
+      if (patientName) {
+        document.getElementById('summaryPatient').textContent = patientName;
+      }
+      
+      if (appointmentType) {
+        const typeMap = {
+          'first': 'First Consultation',
+          'followup': 'Follow-up Visit',
+          'emergency': 'Emergency'
+        };
+        document.getElementById('summaryType').textContent = typeMap[appointmentType] || '-';
+      }
+      
+      checkFormCompletion();
+    }
+
+    function checkFormCompletion() {
+      const confirmBtn = document.getElementById('confirmBtn');
+      
+      const isComplete = 
+        selectedDoctor &&
+        selectedTime &&
+        document.getElementById('appointmentDate').value &&
+        document.getElementById('patientName').value &&
+        document.getElementById('patientAge').value &&
+        document.getElementById('patientPhone').value &&
+        document.getElementById('appointmentType').value &&
+        document.getElementById('reasonForVisit').value;
+      
+      confirmBtn.disabled = !isComplete;
+    }
+
+    document.querySelectorAll('#appointmentSection input, #appointmentSection select, #appointmentSection textarea').forEach(element => {
+      element.addEventListener('input', checkFormCompletion);
+      element.addEventListener('change', checkFormCompletion);
+    });
+
+    function confirmAppointment() {
+      if (!selectedDoctor || !selectedTime) {
+        alert('Please complete all required fields');
+        return;
+      }
+      
+      const appointmentId = 'APT' + Math.floor(Math.random() * 100000).toString().padStart(5, '0');
+      const date = document.getElementById('appointmentDate').value;
+      const dateFormatted = new Date(date).toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      
+      document.getElementById('confirmAppointmentId').textContent = appointmentId;
+      document.getElementById('confirmDoctor').textContent = selectedDoctor.name;
+      document.getElementById('confirmDateTime').textContent = dateFormatted + ' at ' + selectedTime;
+      document.getElementById('confirmPatient').textContent = document.getElementById('patientName').value;
+      document.getElementById('confirmFee').textContent = '₹' + selectedDoctor.fee;
+      
+      document.getElementById('confirmationModal').style.display = 'block';
+    }
+
+    function closeConfirmation() {
+      document.getElementById('confirmationModal').style.display = 'none';
+      
+      document.querySelectorAll('.specialization-card').forEach(card => card.classList.remove('selected'));
+      document.querySelectorAll('.doctor-card').forEach(card => card.classList.remove('selected'));
+      document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove('selected'));
+      
+      document.getElementById('doctorsSection').style.display = 'none';
+      document.getElementById('appointmentSection').style.display = 'none';
+      document.getElementById('summarySection').style.display = 'none';
+      
+      document.getElementById('appointmentDate').value = '';
+      document.getElementById('patientName').value = '';
+      document.getElementById('patientAge').value = '';
+      document.getElementById('patientPhone').value = '';
+      document.getElementById('patientEmail').value = '';
+      document.getElementById('appointmentType').value = '';
+      document.getElementById('reasonForVisit').value = '';
+      document.getElementById('medicalHistory').value = '';
+      document.getElementById('timeSlots').innerHTML = '';
+      
+      document.getElementById('summaryDoctor').textContent = '-';
+      document.getElementById('summarySpecialization').textContent = '-';
+      document.getElementById('summaryDate').textContent = '-';
+      document.getElementById('summaryTime').textContent = '-';
+      document.getElementById('summaryPatient').textContent = '-';
+      document.getElementById('summaryType').textContent = '-';
+      document.getElementById('consultationFee').textContent = '₹0';
+      
+      selectedSpecialization = null;
+      selectedDoctor = null;
+      selectedTime = null;
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        window.location.href = 'login.html';
+      }
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('confirmationModal');
+      if (event.target == modal) {
+        closeConfirmation();
+      }
+    }
+  </script>
+</body>
+</html>

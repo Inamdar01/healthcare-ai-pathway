@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <title>Schedule Test - AI Healthcare</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+    .topnav {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .topnav a {
+      color: white;
+      text-decoration: none;
+      padding: 20px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    .topnav a:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    .logo {
+      font-size: 2rem;
+      color: #4ecdc4 !important;
+      margin-right: auto;
+      padding: 20px 30px;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 25px;
+      margin-right: 20px;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+    .main-content {
+      margin-top: 80px;
+      padding: 40px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .page-title {
+      font-size: 2.5rem;
+      color: white;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      margin-bottom: 10px;
+    }
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .content-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .test-categories {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .category-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    .category-card:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-5px);
+      border-color: #4ecdc4;
+    }
+    .category-card.selected {
+      background: rgba(78, 205, 196, 0.2);
+      border-color: #4ecdc4;
+    }
+    .category-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      color: #4ecdc4;
+    }
+    .category-title {
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .category-description {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+    }
+    .test-options {
+      display: none;
+      margin-top: 30px;
+      padding: 25px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+    }
+    .test-options.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .test-option {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      margin-bottom: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .test-option:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+    }
+    .test-option input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      margin-right: 15px;
+    }
+    .test-info {
+      flex: 1;
+      color: white;
+    }
+    .test-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+    }
+    .test-details {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+    }
+    .test-price {
+      color: #4ecdc4;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .form-section {
+      margin-top: 30px;
+      padding: 25px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+    }
+    .form-section h3 {
+      color: white;
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      color: white;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #4ecdc4;
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .form-group select option {
+      background: #764ba2;
+      color: white;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .selected-tests {
+      margin-top: 30px;
+      padding: 25px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+    }
+    .selected-tests h3 {
+      color: white;
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+    }
+    .selected-test-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    .selected-test-name {
+      color: white;
+      font-weight: 500;
+    }
+    .remove-test {
+      color: #ff6b6b;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .remove-test:hover {
+      transform: scale(1.2);
+    }
+    .total-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      margin-top: 15px;
+      background: rgba(78, 205, 196, 0.2);
+      border-radius: 10px;
+      border: 2px solid #4ecdc4;
+    }
+    .total-label {
+      color: white;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    .total-amount {
+      color: #4ecdc4;
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+      justify-content: center;
+    }
+    .btn {
+      padding: 15px 40px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    .btn-primary {
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      color: white;
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+    .info-banner {
+      background: rgba(78, 205, 196, 0.2);
+      border-left: 4px solid #4ecdc4;
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      color: white;
+    }
+    .info-banner i {
+      color: #4ecdc4;
+      margin-right: 10px;
+    }
+    @media (max-width: 768px) {
+      .main-content { padding: 20px; }
+      .page-title { font-size: 2rem; }
+      .topnav { flex-direction: column; padding: 10px 0; }
+      .user-info { margin: 10px 0; }
+      .form-row { grid-template-columns: 1fr; }
+      .test-categories { grid-template-columns: 1fr; }
+      .content-card { padding: 20px; }
+      .action-buttons { flex-direction: column; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  
+  <nav class="topnav">
+    <i class="fas fa-user-md logo"></i>
+    <a href="home.html">Dashboard</a>
+    <a href="#services">Services</a>
+    <div class="user-info">
+      <div class="user-avatar" id="userAvatar">U</div>
+      <span style="color: white;" id="userName">User</span>
+      <a href="#" onclick="logout()" style="color: #ff6b6b; padding: 5px 10px;">Logout</a>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title"><i class="fas fa-flask"></i> Schedule Laboratory Test</h1>
+      <p class="page-subtitle">Select tests and book your appointment</p>
+    </div>
+
+    <div class="content-card">
+      <div class="info-banner">
+        <i class="fas fa-info-circle"></i>
+        <strong>Important:</strong> Please fast for 8-12 hours before blood tests. Bring your prescription if required by your doctor.
+      </div>
+
+      <h3 style="color: white; margin-bottom: 20px; font-size: 1.4rem;">Select Test Category</h3>
+      <div class="test-categories">
+        <div class="category-card" onclick="selectCategory('blood')">
+          <div class="category-icon"><i class="fas fa-tint"></i></div>
+          <div class="category-title">Blood Tests</div>
+          <div class="category-description">CBC, Lipid Profile, Blood Sugar, etc.</div>
+        </div>
+        <div class="category-card" onclick="selectCategory('imaging')">
+          <div class="category-icon"><i class="fas fa-x-ray"></i></div>
+          <div class="category-title">Imaging</div>
+          <div class="category-description">X-Ray, CT Scan, MRI, Ultrasound</div>
+        </div>
+        <div class="category-card" onclick="selectCategory('cardiac')">
+          <div class="category-icon"><i class="fas fa-heartbeat"></i></div>
+          <div class="category-title">Cardiac Tests</div>
+          <div class="category-description">ECG, Echo, Stress Test</div>
+        </div>
+        <div class="category-card" onclick="selectCategory('specialized')">
+          <div class="category-icon"><i class="fas fa-microscope"></i></div>
+          <div class="category-title">Specialized Tests</div>
+          <div class="category-description">Hormone, Allergy, Cancer Markers</div>
+        </div>
+      </div>
+
+      <div id="bloodTests" class="test-options">
+        <h3 style="color: white; margin-bottom: 20px;">Blood Tests</h3>
+        <div class="test-option" onclick="toggleTest(this, 'Complete Blood Count (CBC)', 500)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">Complete Blood Count (CBC)</div>
+            <div class="test-details">Measures red cells, white cells, platelets</div>
+          </div>
+          <div class="test-price">₹500</div>
+        </div>
+        <div class="test-option" onclick="toggleTest(this, 'Lipid Profile', 800)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">Lipid Profile</div>
+            <div class="test-details">Cholesterol, HDL, LDL, Triglycerides</div>
+          </div>
+          <div class="test-price">₹800</div>
+        </div>
+        <div class="test-option" onclick="toggleTest(this, 'Blood Sugar (Fasting)', 300)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">Blood Sugar (Fasting)</div>
+            <div class="test-details">Fasting glucose levels</div>
+          </div>
+          <div class="test-price">₹300</div>
+        </div>
+        <div class="test-option" onclick="toggleTest(this, 'HbA1c (Diabetes)', 600)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">HbA1c (Diabetes Monitoring)</div>
+            <div class="test-details">3-month average blood sugar</div>
+          </div>
+          <div class="test-price">₹600</div>
+        </div>
+        <div class="test-option" onclick="toggleTest(this, 'Liver Function Test', 900)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">Liver Function Test (LFT)</div>
+            <div class="test-details">SGOT, SGPT, Bilirubin, Protein</div>
+          </div>
+          <div class="test-price">₹900</div>
+        </div>
+        <div class="test-option" onclick="toggleTest(this, 'Kidney Function Test', 850)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">Kidney Function Test (KFT)</div>
+            <div class="test-details">Creatinine, Urea, Uric Acid</div>
+          </div>
+          <div class="test-price">₹850</div>
+        </div>
+        <div class="test-option" onclick="toggleTest(this, 'Thyroid Profile', 700)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">Thyroid Profile (T3, T4, TSH)</div>
+            <div class="test-details">Complete thyroid function</div>
+          </div>
+          <div class="test-price">₹700</div>
+        </div>
+      </div>
+
+      <div id="imagingTests" class="test-options">
+        <h3 style="color: white; margin-bottom: 20px;">Imaging Tests</h3>
+        <div class="test-option" onclick="toggleTest(this, 'Chest X-Ray', 400)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">Chest X-Ray</div>
+            <div class="test-details">PA & Lateral view</div>
+          </div>
+          <div class="test-price">₹400</div>
+        </div>
+        <div class="test-option" onclick="toggleTest(this, 'Abdominal Ultrasound', 1200)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">Abdominal Ultrasound</div>
+            <div class="test-details">Complete abdomen scan</div>
+          </div>
+          <div class="test-price">₹1200</div>
+        </div>
+        <div class="test-option" onclick="toggleTest(this, 'CT Scan (Head)', 3500)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">CT Scan (Head)</div>
+            <div class="test-details">Non-contrast brain scan</div>
+          </div>
+          <div class="test-price">₹3500</div>
+        </div>
+        <div class="test-option" onclick="toggleTest(this, 'MRI Scan (Spine)', 6000)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">MRI Scan (Spine)</div>
+            <div class="test-details">Lumbar or cervical spine</div>
+          </div>
+          <div class="test-price">₹6000</div>
+        </div>
+      </div>
+
+      <div id="cardiacTests" class="test-options">
+        <h3 style="color: white; margin-bottom: 20px;">Cardiac Tests</h3>
+        <div class="test-option" onclick="toggleTest(this, 'ECG (Electrocardiogram)', 300)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">ECG (Electrocardiogram)</div>
+            <div class="test-details">12-lead heart rhythm test</div>
+          </div>
+          <div class="test-price">₹300</div>
+        </div>
+        <div class="test-option" onclick="toggleTest(this, '2D Echo', 1800)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">2D Echo (Echocardiography)</div>
+            <div class="test-details">Heart structure and function</div>
+          </div>
+          <div class="test-price">₹1800</div>
+        </div>
+        <div class="test-option" onclick="toggleTest(this, 'TMT (Treadmill Test)', 2000)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">TMT (Treadmill Test)</div>
+            <div class="test-details">Cardiac stress test</div>
+          </div>
+          <div class="test-price">₹2000</div>
+        </div>
+        <div class="test-option" onclick="toggleTest(this, 'Holter Monitoring', 2500)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">24-Hour Holter Monitoring</div>
+            <div class="test-details">Continuous heart monitoring</div>
+          </div>
+          <div class="test-price">₹2500</div>
+        </div>
+      </div>
+
+      <div id="specializedTests" class="test-options">
+        <h3 style="color: white; margin-bottom: 20px;">Specialized Tests</h3>
+        <div class="test-option" onclick="toggleTest(this, 'Vitamin D Test', 1200)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">Vitamin D Test</div>
+            <div class="test-details">25-Hydroxy Vitamin D levels</div>
+          </div>
+          <div class="test-price">₹1200</div>
+        </div>
+        <div class="test-option" onclick="toggleTest(this, 'Vitamin B12', 900)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">Vitamin B12</div>
+            <div class="test-details">Serum B12 levels</div>
+          </div>
+          <div class="test-price">₹900</div>
+        </div>
+        <div class="test-option" onclick="toggleTest(this, 'Allergy Panel', 3500)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">Comprehensive Allergy Panel</div>
+            <div class="test-details">Tests for 50+ allergens</div>
+          </div>
+          <div class="test-price">₹3500</div>
+        </div>
+        <div class="test-option" onclick="toggleTest(this, 'Cancer Markers', 2800)">
+          <input type="checkbox">
+          <div class="test-info">
+            <div class="test-name">Tumor Markers Panel</div>
+            <div class="test-details">CEA, AFP, CA 19-9, PSA</div>
+          </div>
+          <div class="test-price">₹2800</div>
+        </div>
+      </div>
+
+      <div class="selected-tests" id="selectedTestsSection" style="display: none;">
+        <h3><i class="fas fa-check-circle"></i> Selected Tests</h3>
+        <div id="selectedTestsList"></div>
+        <div class="total-section">
+          <div class="total-label">Total Amount:</div>
+          <div class="total-amount" id="totalAmount">₹0</div>
+        </div>
+      </div>
+
+      <div class="form-section" id="appointmentForm" style="display: none;">
+        <h3><i class="fas fa-calendar-alt"></i> Appointment Details</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Preferred Date *</label>
+            <input type="date" id="appointmentDate" required>
+          </div>
+          <div class="form-group">
+            <label>Preferred Time *</label>
+            <select id="appointmentTime" required>
+              <option value="">Select Time Slot</option>
+              <option value="08:00">08:00 AM</option>
+              <option value="09:00">09:00 AM</option>
+              <option value="10:00">10:00 AM</option>
+              <option value="11:00">11:00 AM</option>
+              <option value="14:00">02:00 PM</option>
+              <option value="15:00">03:00 PM</option>
+              <option value="16:00">04:00 PM</option>
+              <option value="17:00">05:00 PM</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" id="patientName" placeholder="Enter your full name" required>
+          </div>
+          <div class="form-group">
+            <label>Age *</label>
+            <input type="number" id="patientAge" placeholder="Enter age" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone Number *</label>
+            <input type="tel" id="patientPhone" placeholder="Enter phone number" required>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="patientEmail" placeholder="Enter email address">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Collection Type *</label>
+          <select id="collectionType" required>
+            <option value="">Select Collection Type</option>
+            <option value="lab">Visit Lab</option>
+            <option value="home">Home Sample Collection (+₹200)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Address (Required for home collection)</label>
+          <textarea id="patientAddress" rows="3" placeholder="Enter complete address with landmark"></textarea>
+        </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" id="confirmBtn" onclick="confirmBooking()" disabled>
+          <i class="fas fa-check-circle"></i> Confirm Booking
+        </button>
+        <a href="home.html" class="btn btn-secondary">
+          <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    let selectedTests = [];
+    let totalCost = 0;
+
+window.addEventListener('DOMContentLoaded', function() {
+  let currentUser = null;
+  try {
+    const userStr = localStorage.getItem('currentUser');
+    if (userStr) {
+      currentUser = JSON.parse(userStr);
+    }
+  } catch (e) {
+    console.error('Error reading user data:', e);
+  }
+  
+  if (currentUser && currentUser.name) {
+    document.getElementById('userName').textContent = currentUser.name;
+    const nameParts = currentUser.name.trim().split(' ');
+    let initials = '';
+    if (nameParts.length >= 2) {
+      initials = nameParts[0][0] + nameParts[nameParts.length - 1][0];
+    } else if (nameParts.length === 1) {
+      initials = nameParts[0][0];
+    }
+    document.getElementById('userAvatar').textContent = initials.toUpperCase();
+  } else {
+    document.getElementById('userName').textContent = 'User';
+    document.getElementById('userAvatar').textContent = 'U';
+  }
+  
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  document.getElementById('startTime').value = now.toISOString().slice(0, 16);
+});
+
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 50, density: { enable: true, value_area: 800 } },
+        color: { value: "#ffffff" },
+        shape: { type: "circle" },
+        opacity: { value: 0.3, random: false },
+        size: { value: 3, random: true },
+        line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.2, width: 1 },
+        move: { enable: true, speed: 2, direction: "none", random: false, straight: false, out_mode: "out" }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+        modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
+      },
+      retina_detect: true
+    });
+
+    function selectCategory(category) {
+      document.querySelectorAll('.category-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      event.target.closest('.category-card').classList.add('selected');
+      
+      document.querySelectorAll('.test-options').forEach(option => {
+        option.classList.remove('active');
+      });
+      
+      const categoryMap = {
+        'blood': 'bloodTests',
+        'imaging': 'imagingTests',
+        'cardiac': 'cardiacTests',
+        'specialized': 'specializedTests'
+      };
+      
+      document.getElementById(categoryMap[category]).classList.add('active');
+    }
+
+    function toggleTest(element, testName, price) {
+      const checkbox = element.querySelector('input[type="checkbox"]');
+      checkbox.checked = !checkbox.checked;
+      
+      if (checkbox.checked) {
+        selectedTests.push({ name: testName, price: price });
+      } else {
+        selectedTests = selectedTests.filter(test => test.name !== testName);
+      }
+      
+      updateSelectedTests();
+    }
+
+    function removeTest(testName) {
+      selectedTests = selectedTests.filter(test => test.name !== testName);
+      
+      document.querySelectorAll('.test-option').forEach(option => {
+        const checkbox = option.querySelector('input[type="checkbox"]');
+        const name = option.querySelector('.test-name').textContent;
+        if (name === testName) {
+          checkbox.checked = false;
+        }
+      });
+      
+      updateSelectedTests();
+    }
+
+    function updateSelectedTests() {
+      const selectedSection = document.getElementById('selectedTestsSection');
+      const selectedList = document.getElementById('selectedTestsList');
+      const appointmentForm = document.getElementById('appointmentForm');
+      const confirmBtn = document.getElementById('confirmBtn');
+      
+      if (selectedTests.length === 0) {
+        selectedSection.style.display = 'none';
+        appointmentForm.style.display = 'none';
+        confirmBtn.disabled = true;
+        return;
+      }
+      
+      selectedSection.style.display = 'block';
+      appointmentForm.style.display = 'block';
+      confirmBtn.disabled = false;
+      
+      totalCost = 0;
+      selectedList.innerHTML = '';
+      
+      selectedTests.forEach(test => {
+        totalCost += test.price;
+        selectedList.innerHTML += `
+          <div class="selected-test-item">
+            <span class="selected-test-name">${test.name}</span>
+            <div style="display: flex; align-items: center; gap: 20px;">
+              <span style="color: #4ecdc4; font-weight: 600;">₹${test.price}</span>
+              <i class="fas fa-times-circle remove-test" onclick="removeTest('${test.name}')"></i>
+            </div>
+          </div>
+        `;
+      });
+      
+      const collectionType = document.getElementById('collectionType').value;
+      let finalAmount = totalCost;
+      if (collectionType === 'home') {
+        finalAmount += 200;
+      }
+      
+      document.getElementById('totalAmount').textContent = '₹' + finalAmount;
+    }
+
+    document.getElementById('collectionType').addEventListener('change', updateSelectedTests);
+
+    function confirmBooking() {
+      const date = document.getElementById('appointmentDate').value;
+      const time = document.getElementById('appointmentTime').value;
+      const name = document.getElementById('patientName').value;
+      const age = document.getElementById('patientAge').value;
+      const phone = document.getElementById('patientPhone').value;
+      const collectionType = document.getElementById('collectionType').value;
+      
+      if (!date || !time || !name || !age || !phone || !collectionType) {
+        alert('Please fill in all required fields!');
+        return;
+      }
+      
+      if (collectionType === 'home' && !document.getElementById('patientAddress').value) {
+        alert('Please provide your address for home collection!');
+        return;
+      }
+      
+      const formattedDate = new Date(date).toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      
+      const collectionText = collectionType === 'home' ? 'Home Collection' : 'Lab Visit';
+      
+      let confirmMessage = `Booking Confirmation\n\n`;
+      confirmMessage += `Patient: ${name} (Age: ${age})\n`;
+      confirmMessage += `Phone: ${phone}\n`;
+      confirmMessage += `Date: ${formattedDate}\n`;
+      confirmMessage += `Time: ${time}\n`;
+      confirmMessage += `Collection: ${collectionText}\n\n`;
+      confirmMessage += `Tests Selected:\n`;
+      selectedTests.forEach(test => {
+        confirmMessage += `• ${test.name} - ₹${test.price}\n`;
+      });
+      confirmMessage += `\nTotal Amount: ₹${document.getElementById('totalAmount').textContent.replace('₹', '')}\n\n`;
+      confirmMessage += `Confirm booking?`;
+      
+      if (confirm(confirmMessage)) {
+        alert('🎉 Booking Confirmed!\n\nYour test has been scheduled successfully.\nA confirmation SMS and email will be sent shortly.\n\nBooking ID: TEST' + Math.floor(Math.random() * 100000));
+        setTimeout(() => {
+          window.location.href = 'home.html';
+        }, 1500);
+      }
+    }
+
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        window.location.href = 'login.html';
+      }
+    }
+  </script>
+</body>
+</html>
