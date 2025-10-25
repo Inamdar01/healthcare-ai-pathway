@@ -76,12 +76,18 @@
 
       <div class="main-grid">
         <div class="card form-card">
-          <form id="predict-form">
-            <div id="fields-container" class="fields-grid" aria-live="polite"></div>
+         <form id="predict-form">
+  <div id="fields-container" class="fields-grid" aria-live="polite"></div>
+  <div id="out" aria-live="polite"></div>
+</form>
 
-            <button type="button" id="predict-btn" class="predict-cta btn-primary">Predict Diabetes Risk</button>
-            <div id="out" aria-live="polite"></div>
-          </form>
+<!-- ⬇ button placed *after* the form -->
+<button type="button" id="predict-btn"
+  class="predict-cta btn-primary"
+  onclick="handlePredictSubmit(event)">
+  Predict Diabetes Risk
+</button>
+
         </div>
 
         <aside class="card info-card">
@@ -431,10 +437,10 @@
         }
 
   // Prevent any native form submission/navigation (avoid page reloads clearing the result)
-  form.addEventListener('submit', handlePredictSubmit);
-  form.onsubmit = function(e) { e.preventDefault(); return false; };
+ // form.addEventListener('submit', handlePredictSubmit);
+  //form.onsubmit = function(e) { e.preventDefault(); return false; };
   const predictBtn = document.getElementById('predict-btn');
-  if (predictBtn) predictBtn.addEventListener('click', handlePredictSubmit);
+  //if (predictBtn) predictBtn.addEventListener('click', handlePredictSubmit);
 
       loadMetadataAndBuildForm();
     </script>

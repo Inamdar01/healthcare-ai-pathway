@@ -76,12 +76,18 @@
 
       <div class="main-grid">
         <div class="card form-card">
-          <form id="predict-form">
-            <div id="fields-container" class="fields-grid" aria-live="polite"></div>
+         <form id="predict-form">
+  <div id="fields-container" class="fields-grid" aria-live="polite"></div>
+  <div id="out" aria-live="polite"></div>
+</form>
 
-            <button type="button" id="predict-btn" class="predict-cta btn-primary">Predict Diabetes Risk</button>
-            <div id="out" aria-live="polite"></div>
-          </form>
+<!-- ⬇ button placed *after* the form -->
+<button type="button" id="predict-btn"
+  class="predict-cta btn-primary"
+  onclick="handlePredictSubmit(event)">
+  Predict Diabetes Risk
+</button>
+
         </div>
 
         <aside class="card info-card">
@@ -115,6 +121,11 @@
     </div>
 
     <script>
+      window.addEventListener("beforeunload", e => {
+  e.preventDefault();
+  e.returnValue = "";
+});
+
       const form = document.getElementById('predict-form');
       const out = document.getElementById('out');
       const fieldsContainer = document.getElementById('fields-container');
@@ -344,8 +355,9 @@
 
       // allow both form submit and button click to trigger same handler
       async function handlePredictSubmit(e) {
-        e.preventDefault();
-        out.style.display = 'none';
+  if (e) e.preventDefault();
+  console.log("🧠 handlePredictSubmit triggered");
+  out.style.display = "none";
 
         if (!form.reportValidity()) {
           // Provide a visible hint when browser validation fails so the user knows why nothing happened
@@ -431,16 +443,18 @@
           out.style.display = 'block';
           out.innerHTML = `<div style="color:#ffd6d6">Request failed: ${err.message}</div>`;
         }
-
+ return false;
       }
 
   // Prevent native form submission which can cause a page reload and clear the result.
-  form.addEventListener('submit', handlePredictSubmit);
-  form.onsubmit = function(e) { e.preventDefault(); return false; };
+  //form.addEventListener('submit', handlePredictSubmit);
+  //form.onsubmit = function(e) { e.preventDefault(); return false; };
   const predictBtn = document.getElementById('predict-btn');
-  if (predictBtn) predictBtn.addEventListener('click', handlePredictSubmit);
+ // if (predictBtn) predictBtn.addEventListener('click', handlePredictSubmit);
 
   loadMetadataAndBuildForm();
+  document.getElementById('predict-btn').addEventListener('click', handlePredictSubmit);
+
     </script>
   </body>
 </html>
