@@ -1,0 +1,8 @@
+{"inputs": {"Pregnancies": 0, "weight_kg": 68, "family_history": "no", "Insulin": 79, "BloodPressure": 66, "Age": 29, "height_cm": 175, "Glucose": 85, "SkinThickness": 20}}
+{"inputs": {"Pregnancies": 0, "weight_kg": 68, "family_history": "no", "Insulin": 79, "BloodPressure": 66, "Age": 29, "height_cm": 175, "Glucose": 85, "SkinThickness": 20}}
+{"inputs": {"height_cm": 175, "weight_kg": 68, "Pregnancies": 0, "Glucose": 85, "BloodPressure": 66, "SkinThickness": 20, "Insulin": 79, "family_history": "no", "Age": 29}}
+{"inputs": {"height_cm": 175, "weight_kg": 68, "Pregnancies": 0, "Glucose": 85, "BloodPressure": 66, "SkinThickness": 20, "Insulin": 79, "family_history": "no", "Age": 29}}
+{"inputs": {"height_cm": 175, "weight_kg": 68, "Pregnancies": 0, "Glucose": 85, "BloodPressure": 66, "SkinThickness": 20, "Insulin": 79, "family_history": "no", "Age": 29}}
+{"inputs": {"height_cm": 175, "weight_kg": 68, "Pregnancies": 0, "Glucose": 85, "BloodPressure": 66, "SkinThickness": 20, "Insulin": 79, "family_history": "no", "Age": 29}}
+{"inputs": {"height_cm": 175, "weight_kg": 62, "Pregnancies": 0, "Glucose": 120, "BloodPressure": 60, "SkinThickness": 20, "Insulin": 70, "family_history": "no", "Age": 52}}
+{"inputs": {"height_cm": 175, "weight_kg": 68, "Pregnancies": 0, "Glucose": 68, "BloodPressure": 70, "SkinThickness": 20, "Insulin": 79, "family_history": "no", "Age": 29}}

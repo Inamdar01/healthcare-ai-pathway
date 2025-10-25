@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Health Risk Predictor</title>
+    <style>
+      :root{ --card-bg: rgba(255,255,255,0.06); --muted: rgba(255,255,255,0.85); }
+      body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 28px; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: #fff; }
+      .container { max-width:1200px; margin: 0 auto; }
+      h1 { font-size: 28px; margin-bottom: 6px; }
+      p.lead { color: rgba(255,255,255,0.9); margin-bottom: 18px }
+      /* top hero/header similar to provided design */
+      .topnav {
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(6px);
+        padding: 12px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+  .topnav .logo { font-size: 1.5rem; color: #4ecdc4; font-weight: 700; display:flex; align-items:center; gap:10px }
+  .topnav .nav-links a { color: rgba(255,255,255,0.95); text-decoration:none; margin-left:18px; padding:8px 15px; border-radius:8px; font-weight:600 }
+  .topnav .nav-links a:hover { background: rgba(255,255,255,0.03) }
+      .hero { text-align:center; margin: 6px 0 18px 0; }
+  .hero h2 { font-size:2.5rem; margin: 10px 0; color:#fff; font-weight:700 }
+      .hero p { color: rgba(255,255,255,0.9); margin-bottom: 14px }
+      .header-badge { display:inline-block; background: linear-gradient(45deg,#ff6b6b,#4ecdc4); color:#fff; padding:10px 18px; border-radius:26px; font-weight:700 }
+      .main-grid { display:grid; grid-template-columns: 1fr 360px; gap: 22px; align-items:start }
+      .card { background: var(--card-bg); border-radius: 14px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+      /* Left form styling */
+      .form-card .fields-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+      label.field { display:block; font-weight:700; color: var(--muted); font-size: 14px; }
+      label.field .field-name { display:block; margin-bottom:8px; color: #fff; font-weight:600 }
+      input.input-field { width:100%; padding:14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); color: #fff; font-size: 14px; box-sizing: border-box }
+      .field-hint { font-size:12px; color: #8bdacb; margin-top:6px }
+      .full-row { grid-column: 1 / -1; }
+      .predict-cta { margin-top:18px; display:block; width:100%; padding:14px 18px; border-radius:10px; background: linear-gradient(45deg,#ff6b6b,#4ecdc4); border:none; color:#fff; font-weight:700; font-size:16px; cursor:pointer }
+
+      /* Right info column */
+      .info-card .badge { display:inline-block; background: rgba(78,205,196,0.12); color:#aaf3e9; padding:8px 12px; border-radius:20px; margin:6px 6px 6px 0; font-weight:600; border:1px solid rgba(78,205,196,0.18) }
+      .info-card h3 { margin-top: 8px; color: #fff }
+      .info-box { background: rgba(255,255,255,0.02); padding:12px; border-radius:8px; margin-top:10px }
+      .small-note { font-size:13px; color: rgba(255,255,255,0.9) }
+      .disclaimer { margin-top:12px; background: linear-gradient(45deg, rgba(255,107,107,0.14), rgba(255,107,107,0.06)); padding:10px; border-radius:8px; border-left:4px solid #ff6b6b }
+
+      /* Output */
+      #out { margin-top:18px; display:none }
+
+      @media(max-width: 980px){ .main-grid{ grid-template-columns: 1fr } .form-card .fields-grid{ grid-template-columns: 1fr } }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="topnav">
+        <div class="logo"><i class="fas fa-robot"></i> Diabetes Risk Predictor</div>
+        <div class="nav-links">
+          <a href="home.html"><i class="fas fa-home"></i> Dashboard</a>
+          <a href="ai-disease-predictor.html"><i class="fas fa-robot"></i> AI Diagnosis</a>
+        </div>
+      </div>
+
+      <div class="hero">
+        <h2>Diabetes Risk Prediction</h2>
+        <p>Machine Learning Model trained on Kaggle's Pima Indians Dataset</p>
+        <div style="margin-top:8px"><span class="header-badge">Logistic Regression ML Algorithm</span></div>
+      </div>
+
+      <h1 style="display:none">Patient Information</h1>
+      <p class="lead" style="display:none">Fill in the values below and press <strong>Predict</strong> to estimate diabetes risk.</p>
+
+      <div class="main-grid">
+        <div class="card form-card">
+          <form id="predict-form">
+            <div id="fields-container" class="fields-grid" aria-live="polite"></div>
+
+            <button type="button" id="predict-btn" class="predict-cta btn-primary">Predict Diabetes Risk</button>
+            <div id="out" aria-live="polite"></div>
+          </form>
+        </div>
+
+        <aside class="card info-card">
+          <h3>About This Model</h3>
+          <div class="info-box">
+            <div class="small-note"><strong>ML Algorithm:</strong></div>
+            <div style="margin-top:8px">
+              <span class="badge">Logistic Regression</span>
+              <span class="badge">Kaggle Dataset</span>
+              <span class="badge">768 Samples</span>
+            </div>
+            <p style="margin-top:12px" class="small-note"><strong>Dataset:</strong> Pima Indians Diabetes Database</p>
+            <p class="small-note"><strong>Accuracy:</strong> ~77% (typical for this dataset)</p>
+            <p class="small-note"><strong>Type:</strong> Binary Classification</p>
+          </div>
+
+          <h3 style="margin-top:14px">How It Works</h3>
+          <div class="info-box">
+            <ol style="margin:0 0 0 18px; padding: 0; color: rgba(255,255,255,0.9)">
+              <li><strong>Feature scaling:</strong> Z-score normalization</li>
+              <li><strong>Logistic regression:</strong> probability estimate</li>
+              <li><strong>Risk levels:</strong> Low / Moderate / High</li>
+            </ol>
+          </div>
+
+          <div class="disclaimer">
+            <strong>Disclaimer:</strong> This is for educational purposes only. Always consult a healthcare professional for diagnosis and treatment.
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById('predict-form');
+      const out = document.getElementById('out');
+      const fieldsContainer = document.getElementById('fields-container');
+      // Fallback feature list used when backend metadata isn't reachable or is empty
+      const FALLBACK_FEATURES = [
+        'Pregnancies','Glucose','BloodPressure','SkinThickness','Insulin','BMI','DiabetesPedigreeFunction','Age'
+      ];
+
+        async function loadMetadataAndBuildForm() { 
+          try {
+            const res = await fetch('http://127.0.0.1:5000/metadata');
+            const meta = await res.json();
+            const names = (meta && Array.isArray(meta.feature_names) && meta.feature_names.length) ? meta.feature_names : FALLBACK_FEATURES;
+            const backendDefaults = meta.defaults || {};
+            fieldsContainer.innerHTML = '';
+          // Build inputs. Replace BMI with Height & Weight fields (we'll compute BMI client-side).
+          names.forEach(name => {
+            // If this is the BMI feature, show Height (m) and Weight (kg) instead
+            if (name === 'BMI') {
+              // Use centimeters for height (more familiar) and validate on submit
+              const labelH = document.createElement('label');
+              labelH.className = 'field full-row';
+              const nameSpanH = document.createElement('span');
+              nameSpanH.className = 'field-name';
+              nameSpanH.textContent = 'Height (cm)';
+              const inputH = document.createElement('input');
+              inputH.className = 'input-field';
+              inputH.type = 'number';
+              inputH.id = 'height_cm';
+              inputH.step = '1';
+              inputH.placeholder = 'e.g. 170';
+              inputH.required = true;
+              labelH.appendChild(nameSpanH);
+              labelH.appendChild(inputH);
+              fieldsContainer.appendChild(labelH);
+
+              const labelW = document.createElement('label');
+              labelW.className = 'field full-row';
+              const nameSpanW = document.createElement('span');
+              nameSpanW.className = 'field-name';
+              nameSpanW.textContent = 'Weight (kg)';
+              const inputW = document.createElement('input');
+              inputW.className = 'input-field';
+              inputW.type = 'number';
+              inputW.id = 'weight_kg';
+              inputW.step = '0.1';
+              inputW.placeholder = 'e.g. 70';
+              inputW.required = true;
+              labelW.appendChild(nameSpanW);
+              labelW.appendChild(inputW);
+              fieldsContainer.appendChild(labelW);
+              return;
+            }
+
+            // For DiabetesPedigreeFunction, ask a simple Yes/No family-history question and map it before submit.
+            if (name === 'DiabetesPedigreeFunction') {
+              const label = document.createElement('label');
+              label.className = 'field full-row';
+              const nameSpan = document.createElement('span');
+              nameSpan.className = 'field-name';
+              nameSpan.textContent = 'Family history of diabetes?';
+
+              const yes = document.createElement('input');
+              yes.type = 'radio';
+              yes.name = 'family_history';
+              yes.id = 'family_history_yes';
+              yes.value = 'yes';
+              yes.required = true;
+              const yesLabel = document.createElement('label');
+              yesLabel.htmlFor = 'family_history_yes';
+              yesLabel.style.marginRight = '12px';
+              yesLabel.textContent = 'Yes';
+
+              const no = document.createElement('input');
+              no.type = 'radio';
+              no.name = 'family_history';
+              no.id = 'family_history_no';
+              no.value = 'no';
+              const noLabel = document.createElement('label');
+              noLabel.htmlFor = 'family_history_no';
+              noLabel.textContent = 'No';
+
+              label.appendChild(nameSpan);
+              label.appendChild(yes);
+              label.appendChild(yesLabel);
+              label.appendChild(no);
+              label.appendChild(noLabel);
+              fieldsContainer.appendChild(label);
+              return;
+            }
+
+            // Default numeric input for other features
+            const id = name.replace(/\s+/g, '_').toLowerCase();
+            const label = document.createElement('label');
+            label.className = 'field';
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'field-name';
+            nameSpan.textContent = name;
+            const input = document.createElement('input');
+            input.className = 'input-field';
+            input.type = 'number';
+            input.id = id;
+            input.value = '';
+            input.step = '0.001';
+            input.required = true;
+
+            if (meta.ranges && meta.ranges[name]) {
+              const r = meta.ranges[name];
+              if (r && r.min !== null && r.max !== null) input.placeholder = `${r.min} - ${r.max}`;
+            } else if (backendDefaults && backendDefaults[name] !== undefined && backendDefaults[name] !== null) {
+              input.placeholder = `e.g. ${backendDefaults[name]}`;
+            }
+
+            const hint = document.createElement('div');
+            hint.className = 'field-hint';
+            if (meta.ranges && meta.ranges[name]) {
+              const rr = meta.ranges[name];
+              if (rr && rr.min !== null && rr.max !== null) {
+                hint.innerHTML = `Typical range: <strong style="color:#8bdacb">${rr.min} - ${rr.max}</strong>`;
+              }
+            }
+
+            label.appendChild(nameSpan);
+            label.appendChild(input);
+            if (hint.textContent) label.appendChild(hint);
+            if (name.toLowerCase().includes('pregnanc')) label.classList.add('full-row');
+            fieldsContainer.appendChild(label);
+          });
+        } catch (err) {
+          // If metadata fetch failed, use fallback feature names so the form still appears.
+          console.warn('metadata fetch failed, using fallback features', err);
+          const names = FALLBACK_FEATURES;
+          const backendDefaults = {};
+          fieldsContainer.innerHTML = '';
+          names.forEach(name => {
+            if (name === 'BMI') {
+              const labelH = document.createElement('label');
+              labelH.className = 'field full-row';
+              const nameSpanH = document.createElement('span');
+              nameSpanH.className = 'field-name';
+              nameSpanH.textContent = 'Height (cm)';
+              const inputH = document.createElement('input');
+              inputH.className = 'input-field';
+              inputH.type = 'number';
+              inputH.id = 'height_cm';
+              inputH.step = '1';
+              inputH.placeholder = 'e.g. 170';
+              inputH.required = true;
+              labelH.appendChild(nameSpanH);
+              labelH.appendChild(inputH);
+              fieldsContainer.appendChild(labelH);
+
+              const labelW = document.createElement('label');
+              labelW.className = 'field full-row';
+              const nameSpanW = document.createElement('span');
+              nameSpanW.className = 'field-name';
+              nameSpanW.textContent = 'Weight (kg)';
+              const inputW = document.createElement('input');
+              inputW.className = 'input-field';
+              inputW.type = 'number';
+              inputW.id = 'weight_kg';
+              inputW.step = '0.1';
+              inputW.placeholder = 'e.g. 70';
+              inputW.required = true;
+              labelW.appendChild(nameSpanW);
+              labelW.appendChild(inputW);
+              fieldsContainer.appendChild(labelW);
+              return;
+            }
+
+            if (name === 'DiabetesPedigreeFunction') {
+              const label = document.createElement('label');
+              label.className = 'field full-row';
+              const nameSpan = document.createElement('span');
+              nameSpan.className = 'field-name';
+              nameSpan.textContent = 'Family history of diabetes?';
+
+              const yes = document.createElement('input');
+              yes.type = 'radio';
+              yes.name = 'family_history';
+              yes.id = 'family_history_yes';
+              yes.value = 'yes';
+              yes.required = true;
+              const yesLabel = document.createElement('label');
+              yesLabel.htmlFor = 'family_history_yes';
+              yesLabel.style.marginRight = '12px';
+              yesLabel.textContent = 'Yes';
+
+              const no = document.createElement('input');
+              no.type = 'radio';
+              no.name = 'family_history';
+              no.id = 'family_history_no';
+              no.value = 'no';
+              const noLabel = document.createElement('label');
+              noLabel.htmlFor = 'family_history_no';
+              noLabel.textContent = 'No';
+
+              label.appendChild(nameSpan);
+              label.appendChild(yes);
+              label.appendChild(yesLabel);
+              label.appendChild(no);
+              label.appendChild(noLabel);
+              fieldsContainer.appendChild(label);
+              return;
+            }
+
+            const id = name.replace(/\s+/g, '_').toLowerCase();
+            const label = document.createElement('label');
+            label.className = 'field';
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'field-name';
+            nameSpan.textContent = name;
+            const input = document.createElement('input');
+            input.className = 'input-field';
+            input.type = 'number';
+            input.id = id;
+            input.value = '';
+            input.step = '0.001';
+            input.required = true;
+            label.appendChild(nameSpan);
+            label.appendChild(input);
+            if (name.toLowerCase().includes('pregnanc')) label.classList.add('full-row');
+            fieldsContainer.appendChild(label);
+          });
+        }
+      }
+
+      // allow both form submit and button click to trigger same handler
+      async function handlePredictSubmit(e) {
+        e.preventDefault();
+        out.style.display = 'none';
+
+        if (!form.reportValidity()) {
+          // Provide a visible hint when browser validation fails so the user knows why nothing happened
+          out.style.display = 'block';
+          out.innerHTML = `<div style="color:#ffd6d6">Please complete all required fields (highlighted by the browser).</div>`;
+          return;
+        }
+
+        try {
+          const metaRes = await fetch('http://127.0.0.1:5000/metadata');
+          const meta = await metaRes.json();
+          const names = meta.feature_names || [];
+          // Validate height (cm) and weight (kg) before computing BMI and building feature vector
+          const h_cm_el = document.getElementById('height_cm');
+          const w_kg_el = document.getElementById('weight_kg');
+          const h_cm = h_cm_el ? Number(h_cm_el.value) : NaN;
+          const w_kg = w_kg_el ? Number(w_kg_el.value) : NaN;
+          // sensible ranges: height 100-250 cm, weight 30-300 kg
+          if (!isFinite(h_cm) || h_cm < 100 || h_cm > 250) {
+            out.style.display = 'block';
+            out.innerHTML = `<div style="color:#ffd6d6">Please enter a valid height in cm (100 - 250).</div>`;
+            return;
+          }
+          if (!isFinite(w_kg) || w_kg < 30 || w_kg > 300) {
+            out.style.display = 'block';
+            out.innerHTML = `<div style="color:#ffd6d6">Please enter a valid weight in kg (30 - 300).</div>`;
+            return;
+          }
+
+          // Build a named inputs object and send to server; server will compute BMI and map family history.
+          const inputs = {};
+          // include height_cm and weight_kg explicitly
+          inputs['height_cm'] = h_cm;
+          inputs['weight_kg'] = w_kg;
+          names.forEach(name => {
+            if (name === 'BMI') return; // server will compute BMI from height_cm & weight_kg
+            if (name === 'DiabetesPedigreeFunction') {
+              const yes = document.getElementById('family_history_yes');
+              inputs['family_history'] = (yes && yes.checked) ? 'yes' : 'no';
+              return;
+            }
+            const id = name.replace(/\s+/g, '_').toLowerCase();
+            const el = document.getElementById(id);
+            inputs[name] = Number(el ? el.value : null);
+          });
+
+          const res = await fetch('http://127.0.0.1:5000/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ inputs })
+          });
+          const data = await res.json();
+          console.log('/predict response status', res.status, data);
+          if (!res.ok) {
+            out.style.display = 'block';
+            out.innerHTML = `<div style="color:#ffd6d6"><strong>Error:</strong> ${data.error || JSON.stringify(data)}</div>`;
+            return;
+          }
+
+          const preds = data.predictions || [];
+          const probs = data.probabilities || null;
+          let html = '';
+          if (probs && Array.isArray(probs) && probs.length && probs[0].length >= 2) {
+            const probPos = probs[0][1];
+            const percent = (probPos * 100).toFixed(1);
+            let level = 'Low';
+            let advice = 'Unlikely — chance is low based on the provided values.';
+            if (probPos >= 0.7) { level = 'High'; advice = 'High likelihood. Please consult a healthcare professional.'; }
+            else if (probPos >= 0.3) { level = 'Moderate'; advice = 'Moderate likelihood. Consider further testing or medical advice.'; }
+            html += `<div style="font-weight:700">Estimated probability: ${percent}%</div>`;
+            html += `<div style="margin-top:8px">Risk level: <strong>${level}</strong></div>`;
+            html += `<div style="margin-top:8px">${advice}</div>`;
+            html += '<hr/>';
+            html += `<div>Model prediction: ${preds[0]}</div>`;
+          } else {
+            html += '<div>Model prediction: ' + JSON.stringify(preds) + '</div>';
+            if (probs) html += '<div>Probabilities: ' + JSON.stringify(probs) + '</div>';
+          }
+          out.innerHTML = html + '<hr/><details style="color:#cde"><summary>Debug: raw response JSON</summary><pre style="white-space:pre-wrap;color:#cde">' + JSON.stringify(data, null, 2) + '</pre></details>';
+          out.style.display = 'block';
+
+        } catch (err) {
+          out.style.display = 'block';
+          out.innerHTML = `<div style="color:#ffd6d6">Request failed: ${err.message}</div>`;
+        }
+
+      }
+
+  // Prevent native form submission which can cause a page reload and clear the result.
+  form.addEventListener('submit', handlePredictSubmit);
+  form.onsubmit = function(e) { e.preventDefault(); return false; };
+  const predictBtn = document.getElementById('predict-btn');
+  if (predictBtn) predictBtn.addEventListener('click', handlePredictSubmit);
+
+  loadMetadataAndBuildForm();
+    </script>
+  </body>
+</html>

@@ -4,12 +4,61 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Reverted to the original standalone styling to ensure visibility and contrast -->
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root{
+      --accent-start: #667eea;
+      --accent-end: #764ba2;
+      --card-bg: rgba(255,255,255,0.06);
+      --muted: rgba(255,255,255,0.85);
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent-start) 0%, var(--accent-end) 100%);
+      padding: 20px;
+    }
+    .topnav {
+      background: rgba(0,0,0,0.12);
+      backdrop-filter: blur(6px);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 10px;
+      margin-bottom: 22px;
+    }
+    .logo { color: #fff; font-weight:700; font-size:1.1rem }
+    .nav-links a { color: rgba(255,255,255,0.9); text-decoration:none; margin-left:12px }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { text-align:center; margin-bottom: 28px }
+    .header h1 { font-size:2rem; color: white; margin-bottom:6px }
+    .header p { color: rgba(255,255,255,0.9) }
+    .main-grid { display:grid; grid-template-columns: 1fr 1fr; gap:22px }
+    .card { background: var(--card-bg); border-radius:12px; padding:20px; border: 1px solid rgba(255,255,255,0.08) }
+    .card h2 { color: #fff; margin-bottom:12px }
+    .symptom-grid { display:grid; grid-template-columns: repeat(2,1fr); gap:10px; max-height:420px; overflow:auto; padding-right:6px }
+    .symptom-item { background: rgba(255,255,255,0.03); color: #fff; padding:10px; border-radius:8px; display:flex; gap:8px; align-items:center }
+    .symptom-item input { width:18px; height:18px }
+    .selected-symptoms { margin-top:16px; background: rgba(255,255,255,0.02); padding:12px; border-radius:8px }
+    .selected-tag { display:inline-block; background: rgba(0,0,0,0.12); color:#fff; padding:6px 10px; border-radius:16px; margin:4px }
+    .predict-btn { width:100%; padding:12px; margin-top:14px; border-radius:10px; background: linear-gradient(45deg,#ff6b6b,#4ecdc4); color:#fff; border:none; font-weight:600; cursor:pointer }
+    .predict-btn:disabled { opacity:0.5; cursor:not-allowed }
+    .results-card { margin-top:16px; background: rgba(0,0,0,0.12); padding:16px; border-radius:10px; color:#fff }
+    .prediction-result { margin-bottom:12px; padding:12px; background: rgba(255,255,255,0.03); border-radius:8px }
+    .confidence { padding:6px 10px; border-radius:18px; color:#fff; font-weight:700 }
+    .confidence.low { background: linear-gradient(45deg,#4ecdc4,#1fa58f) }
+    .confidence.medium { background: linear-gradient(45deg,#f6c85f,#f1b84a) }
+    .confidence.high { background: linear-gradient(45deg,#ff6b6b,#ff4b4b) }
+    @media(max-width:768px){ .main-grid{ grid-template-columns: 1fr } .symptom-grid{ grid-template-columns: 1fr } }
+  </style>
   <title>AI Disease Predictor - Healthcare</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       color: #333;
       padding: 20px;
@@ -61,7 +110,7 @@
     }
     .ai-badge {
       display: inline-block;
-      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      background: linear-gradient(45deg,#ff6b6b,#4ecdc4);
       padding: 8px 20px;
       border-radius: 25px;
       color: white;
@@ -175,7 +224,7 @@
     .predict-btn {
       width: 100%;
       padding: 15px;
-      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      background: linear-gradient(45deg,#ff6b6b,#4ecdc4);
       color: white;
       border: none;
       border-radius: 10px;
@@ -184,6 +233,17 @@
       cursor: pointer;
       transition: all 0.3s ease;
       margin-top: 20px;
+    }
+
+    /* primary button matching dashboard action buttons */
+    .btn-primary {
+      background: linear-gradient(45deg,#ff6b6b,#4ecdc4);
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
     }
     .predict-btn:hover {
       transform: translateY(-3px);
@@ -218,6 +278,18 @@
       margin-bottom: 15px;
       border-left: 4px solid #4ecdc4;
     }
+    /* Risk level styles (extracted from inline JS colors) */
+  .top-summary { margin-bottom:12px; padding:12px; background: rgba(255,255,255,0.03); border-radius:10px; border-left:4px solid transparent; }
+  .top-summary.low { border-left-color: var(--color-low); }
+  .top-summary.medium { border-left-color: var(--color-medium); }
+  .top-summary.high { border-left-color: var(--color-high); }
+
+  .top-summary .advice { margin-top:8px; color: var(--advice-text); }
+
+  .confidence { padding:5px 12px; border-radius:20px; color: white; font-weight:600 }
+  .confidence.low { background: linear-gradient(45deg, var(--color-low), var(--color-low-dark)); }
+  .confidence.medium { background: linear-gradient(45deg, var(--color-medium), var(--color-medium-dark)); }
+  .confidence.high { background: linear-gradient(45deg, var(--color-high), var(--color-high-dark)); }
     .disease-name {
       color: white;
       font-size: 1.3rem;
@@ -346,7 +418,7 @@
           <div id="selectedSymptoms"></div>
         </div>
 
-        <button class="predict-btn" id="predictBtn" onclick="predictDisease()" disabled>
+        <button class="btn-primary predict-btn" id="predictBtn" onclick="predictDisease()" disabled>
           <i class="fas fa-brain"></i> Analyze with AI
         </button>
       </div>
@@ -647,13 +719,31 @@
 
       let html = '';
       predictions.forEach((pred, index) => {
-        const confidenceClass = pred.confidence > 70 ? 'high' : pred.confidence > 50 ? 'medium' : 'low';
-        
+        // determine user-friendly risk level
+        const p = pred.confidence;
+        let level = 'Low';
+        let levelColor = '#4ecdc4';
+        let shortAdvice = 'Unlikely — chance is low based on the provided symptoms.';
+        if (p >= 70) { level = 'High'; levelColor = '#ff6b6b'; shortAdvice = 'High likelihood. Please consult a healthcare professional as soon as possible.'; }
+        else if (p >= 30) { level = 'Moderate'; levelColor = '#f6c85f'; shortAdvice = 'Moderate likelihood. Consider medical advice or further testing.'; }
+
+        // For the top (first) prediction show a short plain-language summary
+        if (index === 0) {
+          // use CSS classes to indicate risk level instead of inline colors
+          html += `
+            <div class="top-summary ${level.toLowerCase()}">
+              <strong>Most likely:</strong> ${pred.disease} — <strong>${pred.confidence.toFixed(1)}%</strong>
+              (<em>${level} likelihood</em>)
+              <div class="advice">${shortAdvice}</div>
+            </div>
+          `;
+        }
+
         html += `
           <div class="prediction-result">
             <div class="disease-name">
               <span>${index + 1}. ${pred.disease}</span>
-              <span class="confidence">${pred.confidence.toFixed(1)}% Match</span>
+              <span class="confidence ${level.toLowerCase()}">${pred.confidence.toFixed(1)}% Match — ${level}</span>
             </div>
             
             <div class="disease-info">

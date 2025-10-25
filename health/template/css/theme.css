@@ -1,0 +1,52 @@
+:root {
+  --color-low: #4ecdc4;
+  --color-low-dark: #1fa58f;
+  --color-medium: #f6c85f;
+  --color-medium-dark: #f1b84a;
+  --color-high: #ff6b6b;
+  --color-high-dark: #ff4b4b;
+  --primary-start: #ff6b6b;
+  --primary-end: #4ecdc4;
+  --bg-gradient-start: #667eea;
+  --bg-gradient-end: #764ba2;
+  --advice-text: rgba(255,255,255,0.95);
+}
+
+/* common utilities used across pages */
+.body-gradient {
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+}
+
+.ai-badge {
+  background: linear-gradient(45deg, var(--primary-start), var(--primary-end));
+}
+
+.btn-primary {
+  background: linear-gradient(45deg, var(--primary-start), var(--primary-end));
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+}
+
+.top-summary { margin-bottom:12px; padding:12px; background: rgba(255,255,255,0.03); border-radius:10px; border-left:4px solid transparent; }
+.top-summary.low { border-left-color: var(--color-low); }
+.top-summary.medium { border-left-color: var(--color-medium); }
+.top-summary.high { border-left-color: var(--color-high); }
+
+.confidence { padding:5px 12px; border-radius:20px; color: white; font-weight:600 }
+.confidence.low { background: linear-gradient(45deg, var(--color-low), var(--color-low-dark)); }
+.confidence.medium { background: linear-gradient(45deg, var(--color-medium), var(--color-medium-dark)); }
+.confidence.high { background: linear-gradient(45deg, var(--color-high), var(--color-high-dark)); }
+
+.advice { margin-top:8px; color: var(--advice-text); }
+
+/* Page variant when used on the gradient background (text/contrast tweaks) */
+.page-on-gradient { color: #ffffff; }
+.page-on-gradient .card { background: rgba(255,255,255,0.06); color: #ffffff; border: 1px solid rgba(255,255,255,0.12); }
+.page-on-gradient .card h2, .page-on-gradient .header h1, .page-on-gradient .header p { color: #ffffff; }
+.page-on-gradient .selected-symptoms, .page-on-gradient .results-card { background: rgba(255,255,255,0.04); }
+.page-on-gradient .selected-tag { background: rgba(78,205,196,0.18); border: 1px solid rgba(78,205,196,0.35); }
+.page-on-gradient .predict-btn { background: linear-gradient(45deg, var(--primary-start), var(--primary-end)); color: #fff; }
+/* range hint style used by health-risk-predictor to highlight min/max in red */
+.range-hint { color: var(--color-high-dark); font-weight: 700; }
