@@ -459,6 +459,30 @@
       font-weight: 600;
       color: #4ecdc4;
     }
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+    }
+    .loading-overlay.active {
+      display: flex;
+    }
+    .loading-content {
+      text-align: center;
+      color: white;
+    }
+    .loading-content i {
+      font-size: 3rem;
+      color: #4ecdc4;
+      margin-bottom: 20px;
+    }
     @media (max-width: 1024px) {
       .content-wrapper {
         grid-template-columns: 1fr;
@@ -482,6 +506,13 @@
 <body>
   <div id="particles-js"></div>
   
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+      <i class="fas fa-spinner fa-spin"></i>
+      <h3>Processing your appointment...</h3>
+    </div>
+  </div>
+
   <nav class="topnav">
     <i class="fas fa-user-md logo"></i>
     <a href="home.html">Dashboard</a>
@@ -500,7 +531,6 @@
     </div>
 
     <div class="content-wrapper">
-      <!-- Select Specialization -->
       <div class="content-card full-width">
         <h3 class="card-title"><i class="fas fa-stethoscope"></i> Select Specialization</h3>
         <div class="info-banner">
@@ -543,13 +573,11 @@
         </div>
       </div>
 
-      <!-- Available Doctors -->
       <div class="content-card" id="doctorsSection" style="display: none;">
         <h3 class="card-title"><i class="fas fa-user-doctor"></i> Available Doctors</h3>
         <div id="doctorsList"></div>
       </div>
 
-      <!-- Appointment Details -->
       <div class="content-card" id="appointmentSection" style="display: none;">
         <h3 class="card-title"><i class="fas fa-calendar-check"></i> Appointment Details</h3>
         
@@ -606,7 +634,6 @@
         </div>
       </div>
 
-      <!-- Appointment Summary -->
       <div class="content-card full-width" id="summarySection" style="display: none;">
         <h3 class="card-title"><i class="fas fa-file-invoice"></i> Appointment Summary</h3>
         
@@ -656,7 +683,6 @@
     </div>
   </div>
 
-  <!-- Confirmation Modal -->
   <div id="confirmationModal" class="confirmation-modal">
     <div class="confirmation-content">
       <div class="confirmation-icon">
@@ -700,10 +726,29 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  
   <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA0FwyvLAtL2OV0DHdzmhZPgzurn0GwubU",
+      authDomain: "ai-healthcare-dd4da.firebaseapp.com",
+      projectId: "ai-healthcare-dd4da",
+      storageBucket: "ai-healthcare-dd4da.firebasestorage.app",
+      messagingSenderId: "811932137178",
+      appId: "1:811932137178:web:5fd25a14f8bb556e4857e3",
+      measurementId: "G-C08EYLKX26"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
     let selectedSpecialization = null;
     let selectedDoctor = null;
     let selectedTime = null;
+    let currentUser = null;
 
     const doctors = {
       cardiology: [
@@ -742,36 +787,36 @@
       ]
     };
 
-    window.addEventListener('DOMContentLoaded', function() {
-  let currentUser = null;
-  try {
-    const userStr = localStorage.getItem('currentUser');
-    if (userStr) {
-      currentUser = JSON.parse(userStr);
-    }
-  } catch (e) {
-    console.error('Error reading user data:', e);
-  }
-  
-  if (currentUser && currentUser.name) {
-    document.getElementById('userName').textContent = currentUser.name;
-    const nameParts = currentUser.name.trim().split(' ');
-    let initials = '';
-    if (nameParts.length >= 2) {
-      initials = nameParts[0][0] + nameParts[nameParts.length - 1][0];
-    } else if (nameParts.length === 1) {
-      initials = nameParts[0][0];
-    }
-    document.getElementById('userAvatar').textContent = initials.toUpperCase();
-  } else {
-    document.getElementById('userName').textContent = 'User';
-    document.getElementById('userAvatar').textContent = 'U';
-  }
-  
-  const now = new Date();
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-  document.getElementById('startTime').value = now.toISOString().slice(0, 16);
-});
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const userDoc = await db.collection('users').doc(user.uid).get();
+      currentUser = {
+        uid: user.uid,
+        email: user.email,
+        ...userDoc.data()
+      };
+
+      document.getElementById('userName').textContent = currentUser.name || 'User';
+      const nameParts = (currentUser.name || 'U').trim().split(' ');
+      let initials = '';
+      if (nameParts.length >= 2) {
+        initials = nameParts[0][0] + nameParts[nameParts.length - 1][0];
+      } else {
+        initials = nameParts[0][0];
+      }
+      document.getElementById('userAvatar').textContent = initials.toUpperCase();
+
+      document.getElementById('patientName').value = currentUser.name || '';
+      document.getElementById('patientEmail').value = currentUser.email || '';
+
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('appointmentDate').min = today;
+    });
+
     particlesJS("particles-js", {
       particles: {
         number: { value: 50, density: { enable: true, value_area: 800 } },
@@ -939,28 +984,63 @@
       element.addEventListener('change', checkFormCompletion);
     });
 
-    function confirmAppointment() {
-      if (!selectedDoctor || !selectedTime) {
+    async function confirmAppointment() {
+      if (!selectedDoctor || !selectedTime || !currentUser) {
         alert('Please complete all required fields');
         return;
       }
-      
-      const appointmentId = 'APT' + Math.floor(Math.random() * 100000).toString().padStart(5, '0');
-      const date = document.getElementById('appointmentDate').value;
-      const dateFormatted = new Date(date).toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      });
-      
-      document.getElementById('confirmAppointmentId').textContent = appointmentId;
-      document.getElementById('confirmDoctor').textContent = selectedDoctor.name;
-      document.getElementById('confirmDateTime').textContent = dateFormatted + ' at ' + selectedTime;
-      document.getElementById('confirmPatient').textContent = document.getElementById('patientName').value;
-      document.getElementById('confirmFee').textContent = '₹' + selectedDoctor.fee;
-      
-      document.getElementById('confirmationModal').style.display = 'block';
+
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      loadingOverlay.classList.add('active');
+
+      try {
+        const appointmentId = 'APT' + Date.now().toString().slice(-8);
+        const date = document.getElementById('appointmentDate').value;
+        const appointmentData = {
+          appointmentId: appointmentId,
+          userId: currentUser.uid,
+          userEmail: currentUser.email,
+          doctorName: selectedDoctor.name,
+          doctorAvatar: selectedDoctor.avatar,
+          specialization: selectedDoctor.spec,
+          appointmentDate: date,
+          appointmentTime: selectedTime,
+          patientName: document.getElementById('patientName').value,
+          patientAge: parseInt(document.getElementById('patientAge').value),
+          patientPhone: document.getElementById('patientPhone').value,
+          patientEmail: document.getElementById('patientEmail').value || currentUser.email,
+          appointmentType: document.getElementById('appointmentType').value,
+          reasonForVisit: document.getElementById('reasonForVisit').value,
+          medicalHistory: document.getElementById('medicalHistory').value || '',
+          consultationFee: selectedDoctor.fee,
+          status: 'confirmed',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        await db.collection('appointments').add(appointmentData);
+
+        loadingOverlay.classList.remove('active');
+
+        const dateFormatted = new Date(date).toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+        
+        document.getElementById('confirmAppointmentId').textContent = appointmentId;
+        document.getElementById('confirmDoctor').textContent = selectedDoctor.name;
+        document.getElementById('confirmDateTime').textContent = dateFormatted + ' at ' + selectedTime;
+        document.getElementById('confirmPatient').textContent = document.getElementById('patientName').value;
+        document.getElementById('confirmFee').textContent = '₹' + selectedDoctor.fee;
+        
+        document.getElementById('confirmationModal').style.display = 'block';
+      } catch (error) {
+        loadingOverlay.classList.remove('active');
+        console.error('Error booking appointment:', error);
+        alert('Failed to book appointment. Please try again.');
+      }
     }
 
     function closeConfirmation() {
@@ -975,10 +1055,10 @@
       document.getElementById('summarySection').style.display = 'none';
       
       document.getElementById('appointmentDate').value = '';
-      document.getElementById('patientName').value = '';
+      document.getElementById('patientName').value = currentUser.name || '';
       document.getElementById('patientAge').value = '';
       document.getElementById('patientPhone').value = '';
-      document.getElementById('patientEmail').value = '';
+      document.getElementById('patientEmail').value = currentUser.email || '';
       document.getElementById('appointmentType').value = '';
       document.getElementById('reasonForVisit').value = '';
       document.getElementById('medicalHistory').value = '';
@@ -1001,7 +1081,9 @@
 
     function logout() {
       if (confirm('Are you sure you want to logout?')) {
-        window.location.href = 'login.html';
+        auth.signOut().then(() => {
+          window.location.href = 'login.html';
+        });
       }
     }
 

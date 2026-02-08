@@ -92,38 +92,6 @@
         font-size: 1rem;
       }
 
-      .login-type-selector {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 30px;
-        background: rgba(255, 255, 255, 0.05);
-        padding: 5px;
-        border-radius: 12px;
-      }
-
-      .login-type-btn {
-        flex: 1;
-        padding: 12px;
-        background: transparent;
-        border: none;
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-      }
-
-      .login-type-btn.active {
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-        color: white;
-      }
-
-      .login-type-btn:hover:not(.active) {
-        background: rgba(255, 255, 255, 0.1);
-        color: rgba(255, 255, 255, 0.9);
-      }
-
       .auth-form {
         display: flex;
         flex-direction: column;
@@ -231,15 +199,23 @@
         margin-bottom: 20px;
       }
 
-      .admin-badge {
-        display: inline-block;
-        background: linear-gradient(45deg, #feca57, #ff6b6b);
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: bold;
-        margin-left: 8px;
-        text-transform: uppercase;
+      .admin-link {
+        text-align: center;
+        margin-top: 15px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+      }
+
+      .admin-link a {
+        color: #feca57;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .admin-link a:hover {
+        color: #ff6b6b;
       }
     </style>
   </head>
@@ -254,12 +230,7 @@
       <div class="auth-container">
         <div class="auth-header">
           <h1 class="auth-title" id="authTitle">Login</h1>
-          <p class="auth-subtitle" id="authSubtitle">Welcome to AI Healthcare</p>
-        </div>
-
-        <div class="login-type-selector">
-          <button class="login-type-btn active" id="userLoginBtn">User Login</button>
-          <button class="login-type-btn" id="adminLoginBtn">Admin Login</button>
+          <p class="auth-subtitle" id="authSubtitle">Welcome back to AI Healthcare</p>
         </div>
 
         <div id="messageContainer"></div>
@@ -292,6 +263,10 @@
           <span id="switchText">Don't have an account?</span>
           <a class="auth-switch-link" id="switchLink">Register here</a>
         </div>
+
+        <div class="admin-link">
+          <a href="admin.html">🔐 Admin Dashboard</a>
+        </div>
       </div>
     </div>
 
@@ -302,7 +277,7 @@
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     
     <script>
-      const firebaseConfig = {
+          const firebaseConfig = {
         apiKey: "AIzaSyA0FwyvLAtL2OV0DHdzmhZPgzurn0GwubU",
         authDomain: "ai-healthcare-dd4da.firebaseapp.com",
         projectId: "ai-healthcare-dd4da",
@@ -312,6 +287,7 @@
         measurementId: "G-C08EYLKX26"
       };
 
+      // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
       const auth = firebase.auth();
       const db = firebase.firestore();
@@ -347,11 +323,8 @@
       const nameGroup = document.getElementById('nameGroup');
       const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
       const messageContainer = document.getElementById('messageContainer');
-      const userLoginBtn = document.getElementById('userLoginBtn');
-      const adminLoginBtn = document.getElementById('adminLoginBtn');
 
       let isLoginMode = true;
-      let isAdminMode = false;
 
       function showScreen(screenName) {
         Object.values(screens).forEach(screen => screen.classList.add('hidden'));
@@ -365,38 +338,12 @@
         }, 5000);
       }
 
-      function switchLoginType(isAdmin) {
-        isAdminMode = isAdmin;
-        
-        if (isAdmin) {
-          userLoginBtn.classList.remove('active');
-          adminLoginBtn.classList.add('active');
-          authSubtitle.textContent = 'Admin Access Portal';
-          if (isLoginMode) {
-            authTitle.innerHTML = 'Admin Login<span class="admin-badge">Admin</span>';
-          }
-        } else {
-          adminLoginBtn.classList.remove('active');
-          userLoginBtn.classList.add('active');
-          authSubtitle.textContent = 'Welcome to AI Healthcare';
-          if (isLoginMode) {
-            authTitle.textContent = 'Login';
-          }
-        }
-        
-        messageContainer.innerHTML = '';
-        authForm.reset();
-      }
-
       function switchAuthMode() {
         isLoginMode = !isLoginMode;
         
         if (isLoginMode) {
-          authTitle.textContent = isAdminMode ? 'Admin Login' : 'Login';
-          if (isAdminMode) {
-            authTitle.innerHTML = 'Admin Login<span class="admin-badge">Admin</span>';
-          }
-          authSubtitle.textContent = isAdminMode ? 'Admin Access Portal' : 'Welcome to AI Healthcare';
+          authTitle.textContent = 'Login';
+          authSubtitle.textContent = 'Welcome back to AI Healthcare';
           authSubmitBtn.textContent = 'LOGIN';
           switchText.textContent = "Don't have an account?";
           switchLink.textContent = 'Register here';
@@ -404,7 +351,7 @@
           confirmPasswordGroup.classList.add('hidden');
         } else {
           authTitle.textContent = 'Register';
-          authSubtitle.textContent = isAdminMode ? 'Register as Admin' : 'Join AI Healthcare today';
+          authSubtitle.textContent = 'Join AI Healthcare today';
           authSubmitBtn.textContent = 'REGISTER';
           switchText.textContent = 'Already have an account?';
           switchLink.textContent = 'Login here';
@@ -441,47 +388,23 @@
 
         try {
           if (isLoginMode) {
+            // Login
             const userCredential = await auth.signInWithEmailAndPassword(email, password);
             const user = userCredential.user;
             
+            // Get user data from Firestore
             const userDoc = await db.collection('users').doc(user.uid).get();
             const userData = userDoc.data();
             
-            // Check if user role matches login type
-            if (isAdminMode && userData.role !== 'admin') {
-              showMessage('Access denied. Admin credentials required.');
-              authSubmitBtn.disabled = false;
-              authSubmitBtn.textContent = 'LOGIN';
-              await auth.signOut();
-              return;
-            }
-            
-            if (!isAdminMode && userData.role === 'admin') {
-              showMessage('Please use Admin Login for administrative access.');
-              authSubmitBtn.disabled = false;
-              authSubmitBtn.textContent = 'LOGIN';
-              await auth.signOut();
-              return;
-            }
-
-            const userInfo = {
+            // Store in localStorage
+            localStorage.setItem('currentUser', JSON.stringify({
               uid: user.uid,
               email: user.email,
               name: userData.name,
               role: userData.role || 'user'
-            };
-            
-            const storageData = JSON.stringify(userInfo);
-            const users = {};
-            users[email] = userInfo;
-            
-            try {
-              localStorage.setItem('currentUser', storageData);
-              localStorage.setItem('healthcareUsers', JSON.stringify(users));
-            } catch (storageError) {
-              console.warn('localStorage not available:', storageError);
-            }
+            }));
 
+            // Log login activity
             await db.collection('users').doc(user.uid).update({
               lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
               loginCount: firebase.firestore.FieldValue.increment(1)
@@ -489,9 +412,10 @@
 
             showMessage('Login successful! Redirecting...', 'success');
             setTimeout(() => {
-              window.location.href = isAdminMode ? 'admin.html' : 'home.html';
+              window.location.href = 'admin.html';
             }, 1500);
           } else {
+            // Register
             if (password !== confirmPassword) {
               showMessage('Passwords do not match.');
               authSubmitBtn.disabled = false;
@@ -506,22 +430,22 @@
               return;
             }
 
+            // Create user
             const userCredential = await auth.createUserWithEmailAndPassword(email, password);
             const user = userCredential.user;
 
-            const userRole = isAdminMode ? 'admin' : 'user';
-
+            // Save user data to Firestore
             await db.collection('users').doc(user.uid).set({
               name: name,
               email: email,
-              role: userRole,
+              role: 'user',
               createdAt: firebase.firestore.FieldValue.serverTimestamp(),
               lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
               loginCount: 1,
               isActive: true
             });
 
-            showMessage(`Registration successful! You can now login${isAdminMode ? ' as admin' : ''}.`, 'success');
+            showMessage('Registration successful! You can now login.', 'success');
             setTimeout(() => {
               switchAuthMode();
               authSubmitBtn.disabled = false;
@@ -551,8 +475,6 @@
         showScreen('auth');
       });
 
-      userLoginBtn.addEventListener('click', () => switchLoginType(false));
-      adminLoginBtn.addEventListener('click', () => switchLoginType(true));
       switchLink.addEventListener('click', switchAuthMode);
       authForm.addEventListener('submit', handleAuth);
     </script>
